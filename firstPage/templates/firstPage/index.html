@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Index Page</title>
+	</head>
+	<body>
+		<h1><a href="{% url 'login' %}">Login here</a></h1>
+		<ul>
+			{% for user in users %}
+				<li>{{ user }}</li>
+			{% endfor %}
+		</ul>
+	</body>
+</html>
