@@ -26,7 +26,7 @@ class Role(models.Model):
         return f'{self.department} - {self.name}'
 
 
-class User(models.Model):
+class UserDetails(models.Model):
     # empID = models.IntegerField(null=True, blank=True)
     name = models.CharField(max_length=100)
     address = models.CharField(max_length=8000)
@@ -101,7 +101,7 @@ class Client(models.Model):
                                 blank=False,
                                 # default=0,
                                 related_name='clientPartner')
-    user = models.ForeignKey(User,
+    user = models.ForeignKey(UserDetails,
                              on_delete=models.CASCADE,
                              null=False,
                              blank=False,
@@ -157,13 +157,13 @@ class Ticket(models.Model):
     modifiedDate = models.DateTimeField(auto_now=False, auto_now_add=True)
     status = models.CharField(max_length=100)
     closedDate = models.DateTimeField(auto_now=False, auto_now_add=False, null=True)
-    assignedTo = models.ForeignKey(User,
+    assignedTo = models.ForeignKey(UserDetails,
                              on_delete=models.CASCADE,
                              null=False,
                              blank=False,
                              default=0,
                              related_name='ticketAssignedTo')
-    assignedBy = models.ForeignKey(User,
+    assignedBy = models.ForeignKey(UserDetails,
                              on_delete=models.CASCADE,
                              null=False,
                              blank=False,
@@ -189,13 +189,13 @@ class TicketCommentDetails(models.Model):
                              related_name='commentForTicket')
     sequence = models.IntegerField()
     createdDate = models.DateTimeField(auto_now=True, auto_now_add=False)
-    assignedTo = models.ForeignKey(User,
+    assignedTo = models.ForeignKey(UserDetails,
                              on_delete=models.CASCADE,
                              null=False,
                              blank=False,
                              default=0,
                              related_name='commentAssignedTo')
-    assignedBy = models.ForeignKey(User,
+    assignedBy = models.ForeignKey(UserDetails,
                              on_delete=models.CASCADE,
                              null=False,
                              blank=False,
