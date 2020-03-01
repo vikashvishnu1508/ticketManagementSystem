@@ -1,5 +1,9 @@
 from django.db import models
 
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 # Create your models here.
 class Department(models.Model):
     name = models.CharField(max_length = 100,
@@ -19,28 +23,52 @@ class Role(models.Model):
                                    on_delete=models.CASCADE,
                                    related_name='department',
                                    null=False,
-                                   blank=False,
-                                   default=0)
+                                   blank=False)
     
     def __str__(self):
         return f'{self.department} - {self.name}'
 
 
-class UserDetails(models.Model):
-    # empID = models.IntegerField(null=True, blank=True)
-    name = models.CharField(max_length=100)
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    # bio = models.TextField(max_length=500, blank=True)
+    location = models.CharField(max_length=30, blank=True)
+    birth_date = models.DateField(null=True, blank=True)
     address = models.CharField(max_length=8000)
     phoneNumber = models.CharField(max_length=10)
     role = models.ForeignKey(Role,
                              on_delete=models.CASCADE,
                              related_name='role',
-                             null=False,
-                             blank=False,
-                             default=0)
-    location = models.CharField(max_length=100)
+                             null=True,
+                             blank=True)
     
     def __str__(self):
-        return f'{self.name} - {self.location} - {self.role}'
+        return f'{self.user} - {self.location}'
+
+
+@receiver(post_save, sender=User)
+def update_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+    instance.profile.save()
+
+
+# class UserDetails(models.Model):
+#     # empID = models.IntegerField(null=True, blank=True)
+#     name = models.CharField(max_length=100)
+#     address = models.CharField(max_length=8000)
+#     phoneNumber = models.CharField(max_length=10)
+#     role = models.ForeignKey(Role,
+#                              on_delete=models.CASCADE,
+#                              related_name='role',
+#                              null=False,
+#                              blank=False,
+#                              default=0)
+#     location = models.CharField(max_length=100)
+    
+#     def __str__(self):
+#         return f'{self.name} - {self.location} - {self.role}'
 
 
 class ProductCategory(models.Model):
@@ -101,7 +129,7 @@ class Client(models.Model):
                                 blank=False,
                                 # default=0,
                                 related_name='clientPartner')
-    user = models.ForeignKey(UserDetails,
+    user = models.ForeignKey(User,
                              on_delete=models.CASCADE,
                              null=False,
                              blank=False,
@@ -157,13 +185,13 @@ class Ticket(models.Model):
     modifiedDate = models.DateTimeField(auto_now=False, auto_now_add=True)
     status = models.CharField(max_length=100)
     closedDate = models.DateTimeField(auto_now=False, auto_now_add=False, null=True)
-    assignedTo = models.ForeignKey(UserDetails,
+    assignedTo = models.ForeignKey(User,
                              on_delete=models.CASCADE,
                              null=False,
                              blank=False,
                              default=0,
                              related_name='ticketAssignedTo')
-    assignedBy = models.ForeignKey(UserDetails,
+    assignedBy = models.ForeignKey(User,
                              on_delete=models.CASCADE,
                              null=False,
                              blank=False,
@@ -189,13 +217,13 @@ class TicketCommentDetails(models.Model):
                              related_name='commentForTicket')
     sequence = models.IntegerField()
     createdDate = models.DateTimeField(auto_now=True, auto_now_add=False)
-    assignedTo = models.ForeignKey(UserDetails,
+    assignedTo = models.ForeignKey(User,
                              on_delete=models.CASCADE,
                              null=False,
                              blank=False,
                              default=0,
                              related_name='commentAssignedTo')
-    assignedBy = models.ForeignKey(UserDetails,
+    assignedBy = models.ForeignKey(User,
                              on_delete=models.CASCADE,
                              null=False,
                              blank=False,
