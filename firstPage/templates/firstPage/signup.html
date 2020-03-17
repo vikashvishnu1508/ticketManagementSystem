@@ -4,9 +4,43 @@
 {% endblock %}
 {% block body %}
 	<h2>Sign up</h2>
+  <!--
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Sign up</button>
   </form>
+-->
+
+
+  <div id="signupDiv">
+    <div class="col-md-4">
+      <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+          <p>
+            <div class="form-group">
+              <div class="form-row">
+                <label class="col">{{ field.label }}</label>
+                  <div class="col">{{ field }}</div>
+              </div>
+            </div>
+            <div class="form-row">
+              {% if field.help_text %}
+                <small style="color: grey">{{ field.help_text | safe }}</small>
+              {% endif %}
+            </div>
+            <div class="form-row">
+              {% for error in field.errors %}
+                <p style="color: red">{{ error }}</p>
+              {% endfor %}
+            </div>
+          </p>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Sign up</button>
+      </form>
+    </div>
+  </div>
+
+
 {% endblock %}

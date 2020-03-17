@@ -1,11 +1,15 @@
+
 {% extends "firstPage/base.html" %}
+{% load static %}
 {% block title %}
 	User Page
 {% endblock %}
 {% block body %}
-	<h1>Hi, {{ user.first_name }}</h1>
+	<!--<h1>Hi, {{ user.first_name }}</h1>
 	<ul>
 		<li>Currently logged in as: {{ user.username }}</li>
 		<li><a href="{% url 'logout' %}">Logout here</a></li>
 	</ul>
+	<img src="../css/logo.jpg" alt="logo" >
+	-->
 {% endblock %}

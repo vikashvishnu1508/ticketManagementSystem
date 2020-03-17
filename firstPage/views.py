@@ -6,6 +6,9 @@ from django.urls import reverse
 
 from .models import Department, Role
 from .forms import SignUpForm
+
+from django.conf import settings
+from django.conf.urls.static import static
 # Create your views here.
 def index(request):
     # context = {
@@ -14,12 +17,14 @@ def index(request):
     #     'departments' : Department.objects.all()
     # }
     # return render(request, 'firstPage/index.html', context)
-    if not request.user.is_authenticated:
-        return render(request, 'firstPage/login.html', {'message': None})
-    context = {
-        'user': request.user
-    }
-    return render(request, 'firstPage/user.html', context)
+
+    # code to check for if login
+    # if not request.user.is_authenticated:
+    #     return render(request, 'firstPage/login.html', {'message': None})
+    # context = {
+    #     'user': request.user
+    # }
+    return render(request, 'firstPage/index.html')
 
 def login_view(request):
     username = request.POST['username']
