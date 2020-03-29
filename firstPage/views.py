@@ -6,7 +6,8 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 
 from .models import Department, Role, Product, IssueType, Priority, Status, Issue, Profile, InvestigationDetails, IssueAssignmentDetails, IssueUpdateDetails
-from .forms import SignUpForm, IssueCreationForm, AddUpdate
+from .forms import SignUpForm, IssueCreationForm, AddUpdate, AssignComment
+from .filters import IssuesFilter
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -34,20 +35,12 @@ def index(request):
             form = SignUpForm()
             return render(request, 'firstPage/index.html', {'form': form, 'message': None})
     else:
-        if request.method == 'GET' and request.GET.get('ticket'):
-            ticket = int(request.GET['ticket'])
-            if ticket == 0:
-                issues = Issue.objects.all()
-            else:
-                issues = Issue.objects.filter(pk=ticket)
-            if len(issues) == 0:
-                raise Http404("Ticket number is invalid")
-        else:
-            issues = Issue.objects.filter(assignedTo=request.user)
+        issues = IssuesFilter(request.GET, queryset=Issue.objects.all())
         context = {
             'user': request.user,
             'message': 'LogedIn',
-            'issues': issues
+            'issues': issues.qs,
+            'filter': issues
         }
         return render(request, 'firstPage/index.html', context)
 
@@ -110,11 +103,23 @@ def ticketsAddUpdate(request, ticket):
             update.issue = Issue.objects.get(pk=ticket)
             update.sequence = len(IssueUpdateDetails.objects.filter(issue=ticket)) + 1
             update.save()
-        return HttpResponseRedirect(reverse('index'))
+        return HttpResponseRedirect(reverse('ticket', args=[ticket]))
     else:
         form = AddUpdate()
-        return render(request, 'firstPage/addUpdate.html', {'form': form, 'message': None})
+        return render(request, 'firstPage/addUpdate.html', {'form': form})
 
 
-
+def ticketsAssignComment(request, ticket):
+    if request.method == 'POST':
+        form = AssignComment(data=request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.assignedBy = request.user
+            comment.issue = Issue.objects.get(pk=ticket)
+            comment.sequence = len(IssueAssignmentDetails.objects.filter(issue=ticket)) + 1
+            comment.save()
+        return HttpResponseRedirect(reverse('ticket', args=[ticket]))
+    else:
+        form = AssignComment()
+        return render(request, 'firstPage/assignComment.html', {'form': form})
 

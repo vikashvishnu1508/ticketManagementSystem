@@ -9,7 +9,7 @@
 {% if message == "LogedIn" %}
 
 
-<table class="table table-borderless">
+<table id="myTickets" class="table table-borderless table-condensed">
   <thead class="thead-white">
 		<tr>
 			<th colspan="12">Ticket - {{issue.id}}</th>
@@ -20,13 +20,13 @@
 			<button type="button" class="btn btn-light">Cancel</button></th>
 		</tr>
   </thead>
-  <tbody>
+  <tbody style="height:100px;overflow:scroll">
 	<tr class="thead-dark ">
 		<th colspan="12">Customer / User Details</th>
 	</tr>
 	<tr>
 		<td>
-			<table class=" table table-borderless">
+			<table class=" table table-borderless table-condensed">
 				<tr>
 					<td style="width: 25%"></td>
 					<td style="width: 15%" class="font-weight-bold">Customer / User</td>
@@ -123,41 +123,43 @@
 		</tr>
 		<tr>
 			<td>
-				<table class="table table-borderless">
-					<thead class="thead-dark">
-						<th scope="col">Updates</th>
-						<th></th>
-						<th scope="col">Assignment</th>
-						<th></th>
-					</thead>
-					<tbody>
-						<tr>
-							<th scope="col">S. No.</th>
-							<th scope="col">Date Added</th>
-							<th scope="col">Added By</th>
-							<th scope="col">Update</th>
-						</tr>
-						{% for issueUpdateDetail in issueUpdateDetails %}
-						<tr>
-							<th scope="row">{{ issueUpdateDetail.sequence }}</th>
-							<td>{{ issueUpdateDetail.dateAdded }}</td>
-							<td>{{ issueUpdateDetail.addedBy }}</td>
-							<td>{{ issueUpdateDetail.update }}</td>
-						</tr>
-						{% endfor %}
-					</tbody>
+				<table class="table table-borderless table-condensed">
+					<td id="updateTD" onClick="$('#assignmentTable').hide(); $('#updateTable').show(); $('#updateTD').removeClass('table-dark').addClass('table-light'); $('#assignmentTD').addClass('table-dark').removeClass('table-light')" class="table-light">Updates</td>
+					<td id="assignmentTD" onClick="$('#updateTable').hide(); $('#assignmentTable').show(); $('#assignmentTD').removeClass('table-dark').addClass('table-light'); $('#updateTD').addClass('table-dark').removeClass('table-light')" class="table-dark">Assignment</td>
 				</table>
 			</td>
 		</tr>
-		<tr>
+		<tr id="updateTable" >
 			<td>
-				<table class="table table-borderless">
+				<a class="btn btn-light" href="{% url 'addUpdate' issue.id %}" role="button">Add Update</a>
+				<table class="table table-borderless table-condensed">
+					<tr>
+						<th style="width: 5%" scope="col">S. No.</th>
+						<th style="width: 15%" scope="col">Date Added</th>
+						<th style="width: 10%" scope="col">Added By</th>
+						<th style="width: 70%" scope="col">Update</th>
+					</tr>
+					{% for issueUpdateDetail in issueUpdateDetails %}
+					<tr>
+						<th scope="row">{{ issueUpdateDetail.sequence }}</th>
+						<td>{{ issueUpdateDetail.dateAdded }}</td>
+						<td>{{ issueUpdateDetail.addedBy }}</td>
+						<td>{{ issueUpdateDetail.update }}</td>
+					</tr>
+					{% endfor %}
+				</table>
+			</td>
+		</tr>
+		<tr id="assignmentTable" style="display:none" >
+			<td>
+				<a class="btn btn-light" href="{% url 'assignComment' issue.id %}" role="button">Add Assignment</a>
+				<table class="table table-borderless table-condensed">
 						<tr>
-							<th scope="col">S. No.</th>
-							<th scope="col">Date Added</th>
-							<th scope="col">Added By</th>
-							<th scope="col">Assigned To</th>
-							<th scope="col">Comment</th>
+							<th style="width: 5%" scope="col">S. No.</th>
+							<th style="width: 15%" scope="col">Date Added</th>
+							<th style="width: 10%" scope="col">Added By</th>
+							<th style="width: 10%" scope="col">Assigned To</th>
+							<th style="width: 60%" scope="col">Comment</th>
 						</tr>
 						{% for issueAssignmentDetail in issueAssignmentDetails %}
 						<tr>

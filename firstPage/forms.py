@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.forms import ModelChoiceField
 from django.forms import ModelForm
 
-from .models import Department, Role, Product, IssueType, Priority, Status, Issue, IssueUpdateDetails
+from .models import Department, Role, Product, IssueType, Priority, Status, Issue, IssueUpdateDetails, IssueAssignmentDetails
 
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(max_length=30, required=False, help_text='Required.',
@@ -17,14 +17,14 @@ class SignUpForm(UserCreationForm):
     username = forms.CharField(max_length=30, required=False, help_text='Required.',
                                  widget=forms.TextInput(attrs={'class':'form-control col-md-6 float-left',
                                                                'placeholder':'Username *'}))
-    email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.',
+    email = forms.EmailField(max_length=254, help_text='Required. Enter a valid email address.',
                                  widget=forms.EmailInput(attrs={'class':'form-control col-md-6 float-right',
                                                                'placeholder':'Email Address *'}))
     
-    password1 = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.',
+    password1 = forms.CharField(max_length=254, help_text='Required',
                                  widget=forms.PasswordInput(attrs={'class':'form-control col-md-6 float-left',
                                                                'placeholder':'Password *'}))
-    password2 = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.',
+    password2 = forms.CharField(max_length=254, help_text='Required.',
                                  widget=forms.PasswordInput(attrs={'class':'form-control col-md-6 float-right',
                                                                'placeholder':'Re-enter password *'}))
     
@@ -73,7 +73,7 @@ class IssueCreationForm(ModelForm):
     summary = forms.CharField(max_length=2000, required=False, help_text='Required.',
                                  widget=forms.TextInput(attrs={'class':'form-control',
                                                                'placeholder':'Summary'}))
-    description = forms.CharField(max_length=8000, help_text='Required.',
+    description = forms.CharField(help_text='Required.',
                                  widget=forms.Textarea(attrs={'class':'form-control',
                                                                'placeholder':'Description',}))
     assignedTo = forms.ModelChoiceField(User.objects.all(),
@@ -81,11 +81,6 @@ class IssueCreationForm(ModelForm):
                                                         'placeholder':'Assigned To'}),
                             to_field_name="username",
                             empty_label="Select Assignee")
-    # status = forms.ModelChoiceField(Status.objects.all(),
-    #                         widget=forms.Select(attrs={'class':'ddl form-control',
-    #                                                     'placeholder':'Status'}),
-    #                         to_field_name="status",
-    #                         empty_label=None)
     priority = forms.ModelChoiceField(Priority.objects.all(),
                             widget=forms.Select(attrs={'class':'ddl form-control',
                                                         'placeholder':'Priority'}),
@@ -104,10 +99,25 @@ class IssueCreationForm(ModelForm):
 
 
 class AddUpdate(ModelForm):
-    update = forms.CharField(max_length=8000, help_text='Required.',
-                                 widget=forms.Textarea(attrs={'class':'form-control',
+    update = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control',
                                                             'placeholder':'Add Update',}))
 
     class Meta:
         model = IssueUpdateDetails
         fields = ('update',)
+
+
+
+class AssignComment(ModelForm):
+    assignedTo = forms.ModelChoiceField(User.objects.all(),
+                            widget=forms.Select(attrs={'class':'ddl form-control',
+                                                        'placeholder':'Assigned To'}),
+                            to_field_name="username",
+                            empty_label="Select Assignee")
+    comment = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control',
+                                                        'placeholder':'Add asignment comment',}))
+
+    class Meta:
+        model = IssueAssignmentDetails
+        fields = ('assignedTo',
+                  'comment',)
