@@ -11,6 +11,15 @@ code {
     margin: 0 0.3rem;
 }
 
+.jumbotron {
+    background-color: #8A2BE2;
+    text-align: center;
+}
+
+#wholeContainer {
+    background-color: rgb(99, 21, 224) !important
+}
+
 
 /* #signupDiv {
     float: right;

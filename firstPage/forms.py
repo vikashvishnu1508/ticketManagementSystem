@@ -2,8 +2,9 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.forms import ModelChoiceField
+from django.forms import ModelForm
 
-from .models import Role
+from .models import Department, Role, Product, IssueType, Priority, Status, Issue, IssueUpdateDetails
 
 class SignUpForm(UserCreationForm):
     first_name = forms.CharField(max_length=30, required=False, help_text='Required.',
@@ -57,6 +58,56 @@ class SignUpForm(UserCreationForm):
                   'address',
                   'role',)
 
-    # def __init__(self, *args, **kwargs):
-    #     super(Role, self).__init__(*args, **kwargs)
-    #     self.fields['role'].quertset = Role.objects.all()
+
+class IssueCreationForm(ModelForm):
+    product = forms.ModelChoiceField(Product.objects.all(),
+                            widget=forms.Select(attrs={'class':'ddl form-control',
+                                                        'placeholder':'Project'}),
+                            to_field_name="productName",
+                            empty_label=None)
+    issueType = forms.ModelChoiceField(IssueType.objects.all(),
+                            widget=forms.Select(attrs={'class':'ddl form-control',
+                                                        'placeholder':'Issue Type'}),
+                            to_field_name="issueType",
+                            empty_label=None)
+    summary = forms.CharField(max_length=2000, required=False, help_text='Required.',
+                                 widget=forms.TextInput(attrs={'class':'form-control',
+                                                               'placeholder':'Summary'}))
+    description = forms.CharField(max_length=8000, help_text='Required.',
+                                 widget=forms.Textarea(attrs={'class':'form-control',
+                                                               'placeholder':'Description',}))
+    assignedTo = forms.ModelChoiceField(User.objects.all(),
+                            widget=forms.Select(attrs={'class':'ddl form-control',
+                                                        'placeholder':'Assigned To'}),
+                            to_field_name="username",
+                            empty_label="Select Assignee")
+    # status = forms.ModelChoiceField(Status.objects.all(),
+    #                         widget=forms.Select(attrs={'class':'ddl form-control',
+    #                                                     'placeholder':'Status'}),
+    #                         to_field_name="status",
+    #                         empty_label=None)
+    priority = forms.ModelChoiceField(Priority.objects.all(),
+                            widget=forms.Select(attrs={'class':'ddl form-control',
+                                                        'placeholder':'Priority'}),
+                            to_field_name="priority",
+                            empty_label=None)
+
+    class Meta:
+        model = Issue
+        fields = (  'product',
+                    'issueType',
+                    'summary',
+                    'description',
+                    'assignedTo',
+                    # 'status',
+                    'priority',)
+
+
+class AddUpdate(ModelForm):
+    update = forms.CharField(max_length=8000, help_text='Required.',
+                                 widget=forms.Textarea(attrs={'class':'form-control',
+                                                            'placeholder':'Add Update',}))
+
+    class Meta:
+        model = IssueUpdateDetails
+        fields = ('update',)

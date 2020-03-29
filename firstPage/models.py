@@ -32,7 +32,6 @@ class Role(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    # bio = models.TextField(max_length=500, blank=True)
     location = models.CharField(max_length=30, blank=True)
     birth_date = models.DateField(null=True, blank=True)
     address = models.CharField(max_length=8000)
@@ -54,187 +53,209 @@ def update_user_profile(sender, instance, created, **kwargs):
     instance.profile.save()
 
 
-# class UserDetails(models.Model):
-#     # empID = models.IntegerField(null=True, blank=True)
-#     name = models.CharField(max_length=100)
-#     address = models.CharField(max_length=8000)
-#     phoneNumber = models.CharField(max_length=10)
-#     role = models.ForeignKey(Role,
-#                              on_delete=models.CASCADE,
-#                              related_name='role',
-#                              null=False,
-#                              blank=False,
-#                              default=0)
-#     location = models.CharField(max_length=100)
-    
-#     def __str__(self):
-#         return f'{self.name} - {self.location} - {self.role}'
-
-
-class ProductCategory(models.Model):
-    categoryName = models.CharField(max_length=1000)
-    
-    def __str__(self):
-        return f'{self.categoryName}'
-
-
 class Product(models.Model):
-    categoryName = models.ForeignKey(ProductCategory,
-                                     on_delete=models.CASCADE,
-                                     related_name='category',
-                                     null=False,
-                                     blank=False
-                                    #  ,
-                                    #  default=0
-                                     )
-    productName = models.CharField(max_length=1000)
-    modelNumber = models.CharField(max_length=1000,
-                                   null=False,
-                                   default='1.0')
+    productName = models.CharField(max_length=150)
     
     def __str__(self):
-        return f'{self.categoryName} - {self.productName} - {self.modelNumber}'
+        return f'{self.productName}'
 
 
-class Company(models.Model):
-    name = models.CharField(max_length=100)
-    address = models.CharField(max_length=8000)
-    location = models.CharField(max_length=100)
-    phoneNumber = models.CharField(max_length=10)
+class IssueType(models.Model):
+    issueType = models.CharField(max_length=150)
     
     def __str__(self):
-        return f'{self.name} - {self.location} - {self.phoneNumber}'
+        return f'{self.issueType}'
 
 
-class Partner(models.Model):
-    company = models.ForeignKey(Company,
-                                on_delete=models.CASCADE,
-                                null=False,
-                                blank=False,
-                                default=0,
-                                related_name='partnerCompany')
-    serviceType = models.CharField(max_length=1000)
-    isActive = models.BooleanField(null=False,
-                                   blank=False,
-                                   default=False)
+class Priority(models.Model):
+    priority = models.CharField(max_length=50)
     
     def __str__(self):
-        return f'{self.company} - Service : {self.serviceType} - Active : {self.isActive}'
+        return f'{self.priority}'
+
+class Status(models.Model):
+    status = models.CharField(max_length=50)
+    
+    def __str__(self):
+        return f'{self.status}'
 
 
-class Client(models.Model):
-    partner = models.ForeignKey(Partner,
-                                on_delete=models.CASCADE,
-                                null=False,
-                                blank=False,
-                                # default=0,
-                                related_name='clientPartner')
-    user = models.ForeignKey(User,
-                             on_delete=models.CASCADE,
-                             null=False,
-                             blank=False,
-                            #  default=0,
-                             related_name='actulClientUser')
-    company = models.ForeignKey(Company,
-                                on_delete=models.CASCADE,
-                                null=False,
-                                blank=False,
-                                # default=0,
-                                related_name='clientCompany')
+class Issue(models.Model):
     product = models.ForeignKey(Product,
                              on_delete=models.CASCADE,
                              null=False,
                              blank=False,
-                            #  default=0,
-                             related_name='clientProduct')
-    
-    def __str__(self):
-        return f'{self.company} - {self.product}'
-
-
-class Severity(models.Model):
-    severity = models.CharField(max_length=100)
-    
-    def __str__(self):
-        return f'{self.severity}'
-
-class ServiceDeliveryLevel(models.Model):
-    supportLevel = models.CharField(max_length=100)
-    
-    def __str__(self):
-        return f'{self.supportLevel}'
-
-
-class Ticket(models.Model):
-    client = models.ForeignKey(Client,
+                             related_name='relatedProduct')
+    issueType = models.ForeignKey(IssueType,
                              on_delete=models.CASCADE,
                              null=False,
                              blank=False,
-                             default=0,
-                             related_name='ticket_s_Client')
-    serviceCategory = models.CharField(max_length=8000)
-    severity = models.ForeignKey(Severity,
-                             on_delete=models.CASCADE,
-                             null=False,
-                             blank=False,
-                             default=0,
-                             related_name='ticket_s_severity')
-    issueSubject = models.CharField(max_length=8000)
-    issueDescription = models.TextField()
-    creadtedDate = models.DateTimeField(auto_now=False, auto_now_add=True)
-    modifiedDate = models.DateTimeField(auto_now=False, auto_now_add=True)
-    status = models.CharField(max_length=100)
-    closedDate = models.DateTimeField(auto_now=False, auto_now_add=False, null=True)
+                             related_name='requestType')
+    summary = models.CharField(max_length=2000)
+    description = models.TextField()
     assignedTo = models.ForeignKey(User,
                              on_delete=models.CASCADE,
                              null=False,
                              blank=False,
-                             default=0,
                              related_name='ticketAssignedTo')
     assignedBy = models.ForeignKey(User,
                              on_delete=models.CASCADE,
                              null=False,
                              blank=False,
-                             default=0,
                              related_name='ticketAssignedBy')
-    serviceDeliveryLevel = models.ForeignKey(ServiceDeliveryLevel,
+    creadtedDate = models.DateTimeField(auto_now=False, auto_now_add=True)
+    modifiedDate = models.DateTimeField(auto_now=False, auto_now_add=True)
+    closedDate = models.DateTimeField(auto_now=False, auto_now_add=False, null=True, blank=True)
+    status = models.ForeignKey(Status,
                              on_delete=models.CASCADE,
                              null=False,
                              blank=False,
-                             default=0,
-                             related_name='serviceLevel')
+                             related_name='ticketStatus')
+    priority = models.ForeignKey(Priority,
+                             on_delete=models.CASCADE,
+                             null=False,
+                             blank=False,
+                             related_name='ticketPriority')
     
     def __str__(self):
-        return f'{self.client} - {self.issueSubject}'
+        return f'{self.summary} - {self.status}'
 
 
-class TicketCommentDetails(models.Model):
-    ticket = models.ForeignKey(Ticket,
+class InvestigationDetails(models.Model):
+    issue = models.ForeignKey(Issue,
                              on_delete=models.CASCADE,
                              null=False,
                              blank=False,
-                             default=0,
-                             related_name='commentForTicket')
+                             related_name='ticketStatus')
+    investigationTaken = models.TextField()
+    
+    def __str__(self):
+        return f'{self.issue} - {self.investigationTaken}'
+
+
+
+class IssueAssignmentDetails(models.Model):
+    issue = models.ForeignKey(Issue,
+                             on_delete=models.CASCADE,
+                             null=False,
+                             blank=False,
+                             related_name='assignmentIssue')
     sequence = models.IntegerField()
     createdDate = models.DateTimeField(auto_now=True, auto_now_add=False)
     assignedTo = models.ForeignKey(User,
                              on_delete=models.CASCADE,
                              null=False,
                              blank=False,
-                             default=0,
-                             related_name='commentAssignedTo')
+                             related_name='assignmentAssignedTo')
     assignedBy = models.ForeignKey(User,
                              on_delete=models.CASCADE,
                              null=False,
                              blank=False,
-                             default=0,
-                             related_name='commentAssignedBy')
+                             related_name='assignmentAssignedBy')
     comment = models.TextField()
-    status = models.CharField(max_length=100)
-    modifiedDate = models.DateTimeField(auto_now=True,auto_now_add=False)
     
     def __str__(self):
-        return f'{self.ticket} - {self.comment}'
+        return f'{self.issue} - {self.comment}'
+
+
+class IssueUpdateDetails(models.Model):
+    issue = models.ForeignKey(Issue,
+                             on_delete=models.CASCADE,
+                             null=False,
+                             blank=False,
+                             related_name='updateRelatedIssue')
+    sequence = models.IntegerField()
+    dateAdded = models.DateTimeField(auto_now=True, auto_now_add=False)
+    addedBy = models.ForeignKey(User,
+                             on_delete=models.CASCADE,
+                             null=False,
+                             blank=False,
+                             related_name='addedBy')
+    update = models.TextField()
+    
+    def __str__(self):
+        return f'{self.issue} - {self.update}'
+
+
+# class ProductCategory(models.Model):
+#     categoryName = models.CharField(max_length=1000)
+    
+#     def __str__(self):
+#         return f'{self.categoryName}'
+
+
+# class Product(models.Model):
+#     categoryName = models.ForeignKey(ProductCategory,
+#                                      on_delete=models.CASCADE,
+#                                      related_name='category',
+#                                      null=False,
+#                                      blank=False
+#                                     #  ,
+#                                     #  default=0
+#                                      )
+#     productName = models.CharField(max_length=1000)
+#     modelNumber = models.CharField(max_length=1000,
+#                                    null=False,
+#                                    default='1.0')
+    
+#     def __str__(self):
+#         return f'{self.categoryName} - {self.productName} - {self.modelNumber}'
+
+
+# class Company(models.Model):
+#     name = models.CharField(max_length=100)
+#     address = models.CharField(max_length=8000)
+#     location = models.CharField(max_length=100)
+#     phoneNumber = models.CharField(max_length=10)
+    
+#     def __str__(self):
+#         return f'{self.name} - {self.location} - {self.phoneNumber}'
+
+
+# class Partner(models.Model):
+#     company = models.ForeignKey(Company,
+#                                 on_delete=models.CASCADE,
+#                                 null=False,
+#                                 blank=False,
+#                                 default=0,
+#                                 related_name='partnerCompany')
+#     serviceType = models.CharField(max_length=1000)
+#     isActive = models.BooleanField(null=False,
+#                                    blank=False,
+#                                    default=False)
+    
+#     def __str__(self):
+#         return f'{self.company} - Service : {self.serviceType} - Active : {self.isActive}'
+
+
+# class Client(models.Model):
+#     partner = models.ForeignKey(Partner,
+#                                 on_delete=models.CASCADE,
+#                                 null=False,
+#                                 blank=False,
+#                                 # default=0,
+#                                 related_name='clientPartner')
+#     user = models.ForeignKey(User,
+#                              on_delete=models.CASCADE,
+#                              null=False,
+#                              blank=False,
+#                             #  default=0,
+#                              related_name='actulClientUser')
+#     company = models.ForeignKey(Company,
+#                                 on_delete=models.CASCADE,
+#                                 null=False,
+#                                 blank=False,
+#                                 # default=0,
+#                                 related_name='clientCompany')
+#     product = models.ForeignKey(Product,
+#                              on_delete=models.CASCADE,
+#                              null=False,
+#                              blank=False,
+#                             #  default=0,
+#                              related_name='clientProduct')
+    
+#     def __str__(self):
+#         return f'{self.company} - {self.product}'
 
 
 

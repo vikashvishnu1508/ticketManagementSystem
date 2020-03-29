@@ -1,0 +1,45 @@
+{% extends "firstPage/base.html" %}
+{% block title %}
+	Create Issue
+{% endblock %}
+{% block body %}
+
+<div class="jumbotron jumbotron-fluid">
+    <div class="container createIssue">
+      <div class="row">
+          <div class="col-md-3 createIssue-left">
+          </div>
+          <div class="col-md-6 createIssue-center">
+              <div class="container issue">
+                  {% if message == "Issue Form" %}
+                  <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                      <p class="text-left">
+                        <div class="form-group text-left">
+                            {{ field.label_tag }}
+                            {{field}}
+                        </div>
+                      </p>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary">Create</button>
+                  </form>
+                  {% else %}
+                      <p>{{ message }}</p>
+                      <p><a href = {% url 'index' %}>Click here </a>to go to home page</p>
+                      <br>
+                  {% endif %}
+              </div>
+          </div>
+          <div class="col-md-3 createIssue-right">
+          </div>
+      </div>
+    </div>
+</div>
+
+
+
+
+
+
+{% endblock %}
