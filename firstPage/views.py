@@ -35,11 +35,13 @@ def index(request):
             form = SignUpForm()
             return render(request, 'firstPage/index.html', {'form': form, 'message': None})
     else:
-        issues = IssuesFilter(request.GET, queryset=Issue.objects.all())
+        if len(request.GET) == 0:
+            issues = IssuesFilter({'assignedTo': request.user}, queryset=Issue.objects.all())
+        else:
+            issues = IssuesFilter(request.GET, queryset=Issue.objects.all())
         context = {
             'user': request.user,
             'message': 'LogedIn',
-            'issues': issues.qs,
             'filter': issues
         }
         return render(request, 'firstPage/index.html', context)
@@ -113,10 +115,14 @@ def ticketsAssignComment(request, ticket):
     if request.method == 'POST':
         form = AssignComment(data=request.POST)
         if form.is_valid():
+            issue = Issue.objects.get(pk=ticket)
             comment = form.save(commit=False)
             comment.assignedBy = request.user
-            comment.issue = Issue.objects.get(pk=ticket)
+            comment.issue = issue
             comment.sequence = len(IssueAssignmentDetails.objects.filter(issue=ticket)) + 1
+            issue.assignedTo = comment.assignedTo
+            issue.assignedBy = comment.assignedBy
+            issue.save(update_fields=['assignedTo', 'assignedBy'])
             comment.save()
         return HttpResponseRedirect(reverse('ticket', args=[ticket]))
     else:

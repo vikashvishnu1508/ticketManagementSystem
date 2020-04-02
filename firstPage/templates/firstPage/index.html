@@ -1,6 +1,7 @@
 
 {% extends "firstPage/base.html" %}
 {% load static %}
+{% load crispy_forms_tags %}
 {% block title %}
 	User Page
 {% endblock %}
@@ -49,18 +50,21 @@
 <h4 class="text-left lead">
 Hi <span class="text-left text-capitalize lead">{{user.first_name}}</span>, Here is your tickets
 </h4>
-<!--
-<form class="form-inline" method="GET" >
-    <div class="input-wrap form-group">
-      <label for="searcByTicketID">Search by Ticket ID</label>
-       <input type="text"  class="form-control" name="ticket" id="myInputType" class="block"/>
-       <input type="submit" class="block btn btn-primary" />
-    </div>
-</form>
--->
+
 <br>
 <!-------------------------------------------------------------------------->
 
+<form method="GET">
+  {% for field in filter.form %}
+      <div class="form-group">
+          {{ field.label_tag}} {{ field }}
+      </div>
+  {% endfor %}
+  <button type="submit" class="btn btn-primary">Search</button>
+</form>
+<br>
+
+<!-------------------------------------------------------------------------->
 <script>
 $(function () {
     $('table.table tr').click(function () {
@@ -68,12 +72,7 @@ $(function () {
     });
 })
 </script>
-
-<form method="get">
-  {{ filter.form.as_p }}
-  <button type="submit">Search</button>
-</form>
-
+<!-------------------------------------------------------------------------->
 <table class="table table-striped table-bordered table-hover ">
   <thead class="thead-dark">
       <tr>
@@ -91,7 +90,7 @@ $(function () {
       </tr>
   </thead>
   <tbody>
-  {% for issue in issues %}
+  {% for issue in filter.qs %}
       <tr data-url="{% url 'ticket' issue.id %}">
 
       <th scope="row">{{ issue.id }}</th>
