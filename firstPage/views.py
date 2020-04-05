@@ -8,10 +8,12 @@ from django.contrib.auth.models import User
 from .models import Department, Role, Product, IssueType, Priority, Status, Issue, Profile, InvestigationDetails, IssueAssignmentDetails, IssueUpdateDetails
 from .forms import SignUpForm, IssueCreationForm, AddUpdate, AssignComment
 from .filters import IssuesFilter
+from .tables import IssueTable
 
 from django.conf import settings
 from django.conf.urls.static import static
-
+from django_tables2 import RequestConfig
+from django_tables2.export.export import TableExport
 
 # Create your views here.
 def index(request):
@@ -35,16 +37,35 @@ def index(request):
             form = SignUpForm()
             return render(request, 'firstPage/index.html', {'form': form, 'message': None})
     else:
-        if len(request.GET) == 0:
-            issues = IssuesFilter({'assignedTo': request.user}, queryset=Issue.objects.all())
-        else:
-            issues = IssuesFilter(request.GET, queryset=Issue.objects.all())
+        issues = IssuesFilter(request.GET, queryset=Issue.objects.all())
+        table = IssueTable(issues.qs)
+        RequestConfig(request).configure(table)
+        table.paginate(page=request.GET.get("page", 1), per_page=5)
         context = {
             'user': request.user,
             'message': 'LogedIn',
-            'filter': issues
+            'filter': issues,
+            'table': table
         }
         return render(request, 'firstPage/index.html', context)
+
+
+def myTickets(request):
+#     if len(request.GET) == 0:
+#             issues = IssuesFilter({'assignedTo': request.user}, queryset=Issue.objects.all())
+#         else:
+#             issues = IssuesFilter(request.GET, queryset=Issue.objects.all())
+    issues = IssuesFilter({'assignedTo': request.user}, queryset=Issue.objects.all())
+    table = IssueTable(issues.qs)
+    RequestConfig(request).configure(table)
+    table.paginate(page=request.GET.get("page", 1), per_page=5)
+    context = {
+        'user': request.user,
+        'message': 'LogedIn',
+        'filter': issues,
+        'table': table
+    }
+    return render(request, 'firstPage/index.html', context)
 
 def login_view(request):
     if request.method == 'POST':
