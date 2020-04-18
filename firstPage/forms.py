@@ -101,10 +101,13 @@ class IssueCreationForm(ModelForm):
 class AddUpdate(ModelForm):
     update = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control',
                                                             'placeholder':'Add Update',}))
+    attachments = forms.FileField(widget=forms.FileInput(attrs={'class':'form-control-file',
+                                                            'placeholder':'Upload files',}))
 
     class Meta:
         model = IssueUpdateDetails
-        fields = ('update',)
+        fields = ('update',
+                  'attachments')
 
 
 
@@ -114,10 +117,13 @@ class AssignComment(ModelForm):
                                                         'placeholder':'Assigned To'}),
                             to_field_name="username",
                             empty_label="Select Assignee")
-    comment = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control',
+    comment = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control-file',
                                                         'placeholder':'Add asignment comment',}))
+    attachments = forms.FileField(widget=forms.FileInput(attrs={'class':'form-control-file',
+                                                            'placeholder':'Upload files',}))
 
     class Meta:
         model = IssueAssignmentDetails
         fields = ('assignedTo',
-                  'comment',)
+                  'comment',
+                  'attachments')

@@ -60,7 +60,7 @@ Hi <span class="text-left text-capitalize lead">{{user.first_name}}</span>, Here
   {% for field in filter.form %}
       <tr class="table table-borderless">
           <td>{{ field.label_tag }}</td>
-          <td>{{ field|bootstrap }}</td>
+          <td>{{ field }}</td>
       </tr>
   {% endfor %}
   </table>

@@ -1,0 +1,38 @@
+
+{% extends "firstPage/base.html" %}
+{% load static %}
+{% block title %}
+	Update
+{% endblock %}
+{% block body %}
+
+<div class="jumbotron jumbotron-fluid vertical-center">
+		<div class="container">
+				<div class="row align-items-center">
+						<div class="col-md-12">
+								<table class="table table-borderless">
+									<tbody>
+										<tr>
+											<th class="text-left">Added By: {{ update.addedBy }}</th>
+											<td class="text-right">Added On: {{ update.dateAdded }}</td>
+										</tr>
+										<tr>
+											<th colspan="2" class="text-left">Update: <br>{{ update.update }}</th>
+										</tr>
+										<tr>
+											<th colspan="2" class="text-left">
+												{% if update.attachments %}
+													Attachments: <a href="{{ update.attachments.url }}">{{ attachment_name }}</a>
+												{% else %}
+													Attachments: No attachments
+												{% endif %}
+											</th>
+										<tr>
+									</tbody>
+								</table>
+						</div>
+				</div>
+		</div>
+</div>
+
+{% endblock %}

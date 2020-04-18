@@ -137,7 +137,8 @@
 						<th style="width: 5%" scope="col">S. No.</th>
 						<th style="width: 15%" scope="col">Date Added</th>
 						<th style="width: 10%" scope="col">Added By</th>
-						<th style="width: 70%" scope="col">Update</th>
+						<th style="width: 65%" scope="col">Update</th>
+						<th style="width: 5%" scope="col">Attachments available</th>
 					</tr>
 					{% for issueUpdateDetail in issueUpdateDetails %}
 					<tr>
@@ -145,6 +146,13 @@
 						<td>{{ issueUpdateDetail.dateAdded }}</td>
 						<td>{{ issueUpdateDetail.addedBy }}</td>
 						<td>{{ issueUpdateDetail.update }}</td>
+						<td>
+							{% if issueUpdateDetail.attachments %}
+								Yes
+							{% else %}
+							 	No
+							{% endif %}
+						</td>
 					</tr>
 					{% endfor %}
 				</table>
@@ -159,7 +167,8 @@
 							<th style="width: 15%" scope="col">Date Added</th>
 							<th style="width: 10%" scope="col">Added By</th>
 							<th style="width: 10%" scope="col">Assigned To</th>
-							<th style="width: 60%" scope="col">Comment</th>
+							<th style="width: 55%" scope="col">Comment</th>
+							<th style="width: 5%" scope="col">Attachments available</th>
 						</tr>
 						{% for issueAssignmentDetail in issueAssignmentDetails %}
 						<tr>
@@ -168,6 +177,13 @@
 							<td>{{ issueAssignmentDetail.assignedBy }}</td>
 							<td>{{ issueAssignmentDetail.assignedTo }}</td>
 							<td>{{ issueAssignmentDetail.comment }}</td>
+							<td>
+							{% if issueAssignmentDetail.attachments %}
+								Yes
+							{% else %}
+							 	No
+							{% endif %}
+						</td>
 						</tr>
 						{% endfor %}
 				</table>

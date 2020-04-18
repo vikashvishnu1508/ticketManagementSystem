@@ -158,6 +158,7 @@ class IssueAssignmentDetails(models.Model):
                              blank=False,
                              related_name='assignmentAssignedBy')
     comment = models.TextField()
+    attachments = models.FileField(upload_to='documents/Assignment/', null=True, blank=True)
     
     def __str__(self):
         return f'{self.issue} - {self.comment}'
@@ -177,96 +178,8 @@ class IssueUpdateDetails(models.Model):
                              blank=False,
                              related_name='addedBy')
     update = models.TextField()
+    attachments = models.FileField(upload_to='documents/Updates/', null=True, blank=True)
     
     def __str__(self):
         return f'{self.issue} - {self.update}'
-
-
-# class ProductCategory(models.Model):
-#     categoryName = models.CharField(max_length=1000)
-    
-#     def __str__(self):
-#         return f'{self.categoryName}'
-
-
-# class Product(models.Model):
-#     categoryName = models.ForeignKey(ProductCategory,
-#                                      on_delete=models.CASCADE,
-#                                      related_name='category',
-#                                      null=False,
-#                                      blank=False
-#                                     #  ,
-#                                     #  default=0
-#                                      )
-#     productName = models.CharField(max_length=1000)
-#     modelNumber = models.CharField(max_length=1000,
-#                                    null=False,
-#                                    default='1.0')
-    
-#     def __str__(self):
-#         return f'{self.categoryName} - {self.productName} - {self.modelNumber}'
-
-
-# class Company(models.Model):
-#     name = models.CharField(max_length=100)
-#     address = models.CharField(max_length=8000)
-#     location = models.CharField(max_length=100)
-#     phoneNumber = models.CharField(max_length=10)
-    
-#     def __str__(self):
-#         return f'{self.name} - {self.location} - {self.phoneNumber}'
-
-
-# class Partner(models.Model):
-#     company = models.ForeignKey(Company,
-#                                 on_delete=models.CASCADE,
-#                                 null=False,
-#                                 blank=False,
-#                                 default=0,
-#                                 related_name='partnerCompany')
-#     serviceType = models.CharField(max_length=1000)
-#     isActive = models.BooleanField(null=False,
-#                                    blank=False,
-#                                    default=False)
-    
-#     def __str__(self):
-#         return f'{self.company} - Service : {self.serviceType} - Active : {self.isActive}'
-
-
-# class Client(models.Model):
-#     partner = models.ForeignKey(Partner,
-#                                 on_delete=models.CASCADE,
-#                                 null=False,
-#                                 blank=False,
-#                                 # default=0,
-#                                 related_name='clientPartner')
-#     user = models.ForeignKey(User,
-#                              on_delete=models.CASCADE,
-#                              null=False,
-#                              blank=False,
-#                             #  default=0,
-#                              related_name='actulClientUser')
-#     company = models.ForeignKey(Company,
-#                                 on_delete=models.CASCADE,
-#                                 null=False,
-#                                 blank=False,
-#                                 # default=0,
-#                                 related_name='clientCompany')
-#     product = models.ForeignKey(Product,
-#                              on_delete=models.CASCADE,
-#                              null=False,
-#                              blank=False,
-#                             #  default=0,
-#                              related_name='clientProduct')
-    
-#     def __str__(self):
-#         return f'{self.company} - {self.product}'
-
-
-
-
-
-
-
-
 

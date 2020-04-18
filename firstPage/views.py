@@ -4,6 +4,8 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.models import User
+from django.views import View
+import os
 
 from .models import Department, Role, Product, IssueType, Priority, Status, Issue, Profile, InvestigationDetails, IssueAssignmentDetails, IssueUpdateDetails
 from .forms import SignUpForm, IssueCreationForm, AddUpdate, AssignComment
@@ -119,7 +121,7 @@ def tickets(request, ticket):
 
 def ticketsAddUpdate(request, ticket):
     if request.method == 'POST':
-        form = AddUpdate(data=request.POST)
+        form = AddUpdate(request.POST, request.FILES)
         if form.is_valid():
             update = form.save(commit=False)
             update.addedBy = request.user
@@ -134,7 +136,7 @@ def ticketsAddUpdate(request, ticket):
 
 def ticketsAssignComment(request, ticket):
     if request.method == 'POST':
-        form = AssignComment(data=request.POST)
+        form = AssignComment(request.POST, request.FILES)
         if form.is_valid():
             issue = Issue.objects.get(pk=ticket)
             comment = form.save(commit=False)
@@ -150,3 +152,12 @@ def ticketsAssignComment(request, ticket):
         form = AssignComment()
         return render(request, 'firstPage/assignComment.html', {'form': form})
 
+class Updates(View):
+    def get(self, request, ticket, sequence):
+        update = IssueUpdateDetails.objects.get(issue=ticket, sequence= sequence)
+        attachment_name = os.path.basename(update.attachments.path) if update.attachments != None else None
+        context= {
+            'update': update,
+            'attachment_name': attachment_name
+        }
+        return render(request, "firstPage/update.html", context)
