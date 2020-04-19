@@ -133,6 +133,7 @@
 			<td>
 				<a class="btn btn-light" href="{% url 'addUpdate' issue.id %}" role="button">Add Update</a>
 				<table class="table table-borderless table-condensed">
+					<thead>
 					<tr>
 						<th style="width: 5%" scope="col">S. No.</th>
 						<th style="width: 15%" scope="col">Date Added</th>
@@ -140,12 +141,14 @@
 						<th style="width: 65%" scope="col">Update</th>
 						<th style="width: 5%" scope="col">Attachments available</th>
 					</tr>
+					</thead>
+					<tbody>
 					{% for issueUpdateDetail in issueUpdateDetails %}
-					<tr>
+					<tr data-myTarget="update" data-id={{ forloop.counter }} class="{% cycle 'odd' 'even' %}">
 						<th scope="row">{{ issueUpdateDetail.sequence }}</th>
 						<td>{{ issueUpdateDetail.dateAdded }}</td>
 						<td>{{ issueUpdateDetail.addedBy }}</td>
-						<td>{{ issueUpdateDetail.update }}</td>
+						<td>{{ issueUpdateDetail.update|truncatewords:6 }}</td>
 						<td>
 							{% if issueUpdateDetail.attachments %}
 								Yes
@@ -155,6 +158,7 @@
 						</td>
 					</tr>
 					{% endfor %}
+					</tbody>
 				</table>
 			</td>
 		</tr>
@@ -171,12 +175,12 @@
 							<th style="width: 5%" scope="col">Attachments available</th>
 						</tr>
 						{% for issueAssignmentDetail in issueAssignmentDetails %}
-						<tr>
+						<tr data-myTarget="assignment" data-id={{ forloop.counter }} class="{% cycle 'odd' 'even' %}">
 							<th scope="row">{{ issueAssignmentDetail.sequence }}</th>
 							<td>{{ issueAssignmentDetail.createdDate }}</td>
 							<td>{{ issueAssignmentDetail.assignedBy }}</td>
 							<td>{{ issueAssignmentDetail.assignedTo }}</td>
-							<td>{{ issueAssignmentDetail.comment }}</td>
+							<td>{{ issueAssignmentDetail.comment|truncatewords:6 }}</td>
 							<td>
 							{% if issueAssignmentDetail.attachments %}
 								Yes
@@ -191,6 +195,18 @@
 		</tr>
   </tbody>
 </table>
+
+<script>
+$(function () {
+    $('table tr').click(function () {
+        // var dataID = $(this).attr("data-id");
+				// var dataURL = $(this).attr("data-target");
+				console.log("/" + $(this).attr("data-myTarget") + "/" + $(this).attr("data-id"));
+				//console.log(window.location.href);
+        //window.location.href = "/" + dataURL + "/" + dataID;
+    });
+})
+</script>
 
 {% endif %}
 

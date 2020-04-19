@@ -8,12 +8,13 @@ urlpatterns = [
     path('', views.index, name="index"),
     path('<int:ticket>', views.tickets, name="ticket"),
     path('myTicket', views.myTickets, name="myTicket"),
-    path('<int:ticket>/addUpdate', views.ticketsAddUpdate, name="addUpdate"),
-    path('<int:ticket>/assignComment', views.ticketsAssignComment, name="assignComment"),
+    path('<int:ticket>/addUpdate', views.TicketAddUpdate.as_view(), name="addUpdate"),
+    path('<int:ticket>/assignComment', views.TicketsAssignComment.as_view(), name="assignComment"),
     path('login', views.login_view, name="login"),
     path('logout', views.logout_view, name="logout"),
-    path('createIssue', views.create_issue, name='createIssue'),
-    path('<int:ticket>/update/<int:sequence>', views.Updates.as_view(), name="update")
+    path('createIssue', views.CreateIssue.as_view(), name='createIssue'),
+    path('<int:ticket>/update/<int:sequence>', views.Updates.as_view(), name="update"),
+    path('<int:ticket>/allUpdates', views.AllUpdatesList.as_view(), name="allUpdate")
 ]
 
 if settings.DEBUG:

@@ -107,7 +107,7 @@ class AddUpdate(ModelForm):
     class Meta:
         model = IssueUpdateDetails
         fields = ('update',
-                  'attachments')
+                  'attachments',)
 
 
 

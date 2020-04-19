@@ -1,11 +1,13 @@
+import os
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.views import View
-import os
+from django.views.generic import ListView
+
 
 from .models import Department, Role, Product, IssueType, Priority, Status, Issue, Profile, InvestigationDetails, IssueAssignmentDetails, IssueUpdateDetails
 from .forms import SignUpForm, IssueCreationForm, AddUpdate, AssignComment
@@ -53,10 +55,6 @@ def index(request):
 
 
 def myTickets(request):
-#     if len(request.GET) == 0:
-#             issues = IssuesFilter({'assignedTo': request.user}, queryset=Issue.objects.all())
-#         else:
-#             issues = IssuesFilter(request.GET, queryset=Issue.objects.all())
     issues = IssuesFilter({'assignedTo': request.user}, queryset=Issue.objects.all())
     table = IssueTable(issues.qs)
     RequestConfig(request).configure(table)
@@ -86,18 +84,21 @@ def logout_view(request):
     logout(request)
     return render(request, 'firstPage/logout.html', {'message': 'Logout sucessfuly!'})
 
-def create_issue(request):
-    if request.method == 'POST':
-            form = IssueCreationForm(data=request.POST)
-            if form.is_valid():
-                issue = form.save(commit=False)
-                issue.assignedBy = request.user
-                issue.status = Status.objects.get(pk=1)
-                issue.save()
-            return render(request, 'firstPage/createIssue.html', {'message': 'Issue Created sucessfuly!'})
-    else:
+
+class CreateIssue(View):
+    def get(self, request):
         form = IssueCreationForm()
         return render(request, 'firstPage/createIssue.html', {'form': form, 'message': 'Issue Form'})
+
+    def post(self, request):
+        form = IssueCreationForm(data=request.POST)
+        if form.is_valid():
+            issue = form.save(commit=False)
+            issue.assignedBy = request.user
+            issue.status = Status.objects.get(pk=1)
+            issue.save()
+        return render(request, 'firstPage/createIssue.html', {'message': 'Issue Created sucessfuly!'})
+
 
 def tickets(request, ticket):
     try:
@@ -119,8 +120,13 @@ def tickets(request, ticket):
     except:
         raise Http404("Please try again after sometime")
 
-def ticketsAddUpdate(request, ticket):
-    if request.method == 'POST':
+
+class TicketAddUpdate(View):
+    def get(self, request, ticket):
+        form = AddUpdate()
+        return render(request, 'firstPage/addUpdate.html', {'form': form})
+
+    def post(self, request, ticket):
         form = AddUpdate(request.POST, request.FILES)
         if form.is_valid():
             update = form.save(commit=False)
@@ -129,13 +135,14 @@ def ticketsAddUpdate(request, ticket):
             update.sequence = len(IssueUpdateDetails.objects.filter(issue=ticket)) + 1
             update.save()
         return HttpResponseRedirect(reverse('ticket', args=[ticket]))
-    else:
-        form = AddUpdate()
-        return render(request, 'firstPage/addUpdate.html', {'form': form})
 
 
-def ticketsAssignComment(request, ticket):
-    if request.method == 'POST':
+class TicketsAssignComment(View):
+    def get(self, request, ticket):
+        form = AssignComment()
+        return render(request, 'firstPage/assignComment.html', {'form': form})
+
+    def post(self, request, ticket):
         form = AssignComment(request.POST, request.FILES)
         if form.is_valid():
             issue = Issue.objects.get(pk=ticket)
@@ -148,9 +155,6 @@ def ticketsAssignComment(request, ticket):
             issue.save(update_fields=['assignedTo', 'assignedBy'])
             comment.save()
         return HttpResponseRedirect(reverse('ticket', args=[ticket]))
-    else:
-        form = AssignComment()
-        return render(request, 'firstPage/assignComment.html', {'form': form})
 
 class Updates(View):
     def get(self, request, ticket, sequence):
@@ -161,3 +165,13 @@ class Updates(View):
             'attachment_name': attachment_name
         }
         return render(request, "firstPage/update.html", context)
+
+
+class AllUpdatesList(ListView):
+    model = IssueUpdateDetails
+    context_object_name = 'updates'
+    template_name='firstPage/update.html'
+    paginate_by=1
+
+    def get_queryset(self):
+        return IssueUpdateDetails.objects.filter(issue=self.kwargs['ticket'])
