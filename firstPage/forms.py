@@ -29,8 +29,9 @@ class SignUpForm(UserCreationForm):
                                                                'placeholder':'Re-enter password *'}))
     
     birth_date = forms.DateField(help_text="Required. Format: YYYY-MM-DD",
-                                 widget=forms.DateInput(attrs={'class':'form-control col-md-6 float-left',
-                                                               'placeholder':'Please enter Birth Date *'}))
+                                 widget=forms.DateInput(attrs={'id':'birth-date',
+                                                                'class':'form-control col-md-6 float-left',
+                                                                'placeholder':'Please enter Birth Date *'}))
     phoneNumber = forms.CharField(max_length=10, help_text='Required.',
                                  widget=forms.TextInput(attrs={'class':'form-control col-md-6 float-right',
                                                                'placeholder':'Phone Number *'}))

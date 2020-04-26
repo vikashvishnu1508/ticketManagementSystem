@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.views import View
-from django.views.generic import ListView
+from django.views.generic import ListView, CreateView
 
 
 from .models import Department, Role, Product, IssueType, Priority, Status, Issue, Profile, InvestigationDetails, IssueAssignmentDetails, IssueUpdateDetails
@@ -16,8 +16,10 @@ from .tables import IssueTable
 
 from django.conf import settings
 from django.conf.urls.static import static
-from django_tables2 import RequestConfig
+from django_tables2 import RequestConfig, SingleTableView
 from django_tables2.export.export import TableExport
+from django_filters.views import FilterView
+from django_tables2.views import SingleTableMixin
 
 # Create your views here.
 def index(request):
@@ -137,41 +139,51 @@ class TicketAddUpdate(View):
         return HttpResponseRedirect(reverse('ticket', args=[ticket]))
 
 
-class TicketsAssignComment(View):
-    def get(self, request, ticket):
-        form = AssignComment()
-        return render(request, 'firstPage/assignComment.html', {'form': form})
-
-    def post(self, request, ticket):
-        form = AssignComment(request.POST, request.FILES)
-        if form.is_valid():
-            issue = Issue.objects.get(pk=ticket)
-            comment = form.save(commit=False)
-            comment.assignedBy = request.user
-            comment.issue = issue
-            comment.sequence = len(IssueAssignmentDetails.objects.filter(issue=ticket)) + 1
-            issue.assignedTo = comment.assignedTo
-            issue.assignedBy = comment.assignedBy
-            issue.save(update_fields=['assignedTo', 'assignedBy'])
-            comment.save()
-        return HttpResponseRedirect(reverse('ticket', args=[ticket]))
-
-class Updates(View):
-    def get(self, request, ticket, sequence):
-        update = IssueUpdateDetails.objects.get(issue=ticket, sequence= sequence)
-        attachment_name = os.path.basename(update.attachments.path) if update.attachments != None else None
-        context= {
-            'update': update,
-            'attachment_name': attachment_name
-        }
-        return render(request, "firstPage/update.html", context)
-
-
-class AllUpdatesList(ListView):
+class UpdatesList(ListView):
     model = IssueUpdateDetails
     context_object_name = 'updates'
-    template_name='firstPage/update.html'
-    paginate_by=1
+    template_name = 'firstPage/update.html'
+    paginate_by = 1
 
     def get_queryset(self):
         return IssueUpdateDetails.objects.filter(issue=self.kwargs['ticket'])
+
+class AssignmentsList(ListView):
+    model = IssueAssignmentDetails
+    context_object_name = 'assignments'
+    template_name = 'firstPage/assigment.html'
+    paginate_by = 1
+
+    def get_queryset(self):
+        return IssueAssignmentDetails.objects.filter(issue=self.kwargs['ticket'])
+
+
+class TicketsAssignComment(CreateView):
+    form_class = AssignComment
+    model = IssueAssignmentDetails
+    # fields = ['assignedTo','comment', 'attachments']
+    template_name = 'firstPage/assignComment.html'
+    
+    def form_valid(self, form):
+        issue = Issue.objects.get(pk=self.kwargs['ticket'])
+        form.instance.assignedBy = self.request.user
+        form.instance.issue = issue
+        form.instance.sequence = len(IssueAssignmentDetails.objects.filter(issue=self.kwargs['ticket'])) + 1
+        issue.assignedTo = form.instance.assignedTo
+        issue.assignedBy = form.instance.assignedBy
+        issue.save(update_fields=['assignedTo', 'assignedBy'])
+        form.save()
+        # print(self.kwargs['ticket'])
+        return super(TicketsAssignComment, self).form_valid(form)
+    
+    def get_success_url(self):
+        return reverse('ticket', args=[self.kwargs['ticket']])
+
+
+class FilteredIssueListView(SingleTableMixin, FilterView):
+    table_class = IssueTable
+    model = Issue
+    template_name = "firstPage/issue.html"
+    filterset_class = IssuesFilter
+    paginate_by = 10
+

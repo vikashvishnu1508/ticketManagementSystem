@@ -142,22 +142,22 @@
 						<th style="width: 5%" scope="col">Attachments available</th>
 					</tr>
 					</thead>
-					<tbody>
-					{% for issueUpdateDetail in issueUpdateDetails %}
-					<tr data-myTarget="update" data-id={{ forloop.counter }} class="{% cycle 'odd' 'even' %}">
-						<th scope="row">{{ issueUpdateDetail.sequence }}</th>
-						<td>{{ issueUpdateDetail.dateAdded }}</td>
-						<td>{{ issueUpdateDetail.addedBy }}</td>
-						<td>{{ issueUpdateDetail.update|truncatewords:6 }}</td>
-						<td>
-							{% if issueUpdateDetail.attachments %}
-								Yes
-							{% else %}
-							 	No
-							{% endif %}
-						</td>
-					</tr>
-					{% endfor %}
+					<tbody class="update-assignment-tbody">
+						{% for issueUpdateDetail in issueUpdateDetails %}
+							<tr data-target="update" data-id={{ forloop.counter }} class="{% cycle 'odd' 'even' %}">
+								<th scope="row">{{ issueUpdateDetail.sequence }}</th>
+								<td>{{ issueUpdateDetail.dateAdded }}</td>
+								<td>{{ issueUpdateDetail.addedBy }}</td>
+								<td>{{ issueUpdateDetail.update|truncatewords:6 }}</td>
+								<td>
+									{% if issueUpdateDetail.attachments %}
+										Yes
+									{% else %}
+										No
+									{% endif %}
+								</td>
+							</tr>
+						{% endfor %}
 					</tbody>
 				</table>
 			</td>
@@ -166,30 +166,34 @@
 			<td>
 				<a class="btn btn-light" href="{% url 'assignComment' issue.id %}" role="button">Add Assignment</a>
 				<table class="table table-borderless table-condensed">
-						<tr>
-							<th style="width: 5%" scope="col">S. No.</th>
-							<th style="width: 15%" scope="col">Date Added</th>
-							<th style="width: 10%" scope="col">Added By</th>
-							<th style="width: 10%" scope="col">Assigned To</th>
-							<th style="width: 55%" scope="col">Comment</th>
-							<th style="width: 5%" scope="col">Attachments available</th>
-						</tr>
-						{% for issueAssignmentDetail in issueAssignmentDetails %}
-						<tr data-myTarget="assignment" data-id={{ forloop.counter }} class="{% cycle 'odd' 'even' %}">
-							<th scope="row">{{ issueAssignmentDetail.sequence }}</th>
-							<td>{{ issueAssignmentDetail.createdDate }}</td>
-							<td>{{ issueAssignmentDetail.assignedBy }}</td>
-							<td>{{ issueAssignmentDetail.assignedTo }}</td>
-							<td>{{ issueAssignmentDetail.comment|truncatewords:6 }}</td>
-							<td>
-							{% if issueAssignmentDetail.attachments %}
-								Yes
-							{% else %}
-							 	No
-							{% endif %}
-						</td>
-						</tr>
-						{% endfor %}
+						<thead>
+							<tr>
+								<th style="width: 5%" scope="col">S. No.</th>
+								<th style="width: 15%" scope="col">Date Added</th>
+								<th style="width: 10%" scope="col">Added By</th>
+								<th style="width: 10%" scope="col">Assigned To</th>
+								<th style="width: 55%" scope="col">Comment</th>
+								<th style="width: 5%" scope="col">Attachments available</th>
+							</tr>
+						</thead>
+						<tbody class="update-assignment-tbody">
+							{% for issueAssignmentDetail in issueAssignmentDetails %}
+								<tr data-target="assignment" data-id={{ forloop.counter }} class="{% cycle 'odd' 'even' %}">
+									<th scope="row">{{ issueAssignmentDetail.sequence }}</th>
+									<td>{{ issueAssignmentDetail.createdDate }}</td>
+									<td>{{ issueAssignmentDetail.assignedBy }}</td>
+									<td>{{ issueAssignmentDetail.assignedTo }}</td>
+									<td>{{ issueAssignmentDetail.comment|truncatewords:6 }}</td>
+									<td>
+									{% if issueAssignmentDetail.attachments %}
+										Yes
+									{% else %}
+										No
+									{% endif %}
+								</td>
+								</tr>
+							{% endfor %}
+						<tbody>
 				</table>
 			</td>
 		</tr>
@@ -198,12 +202,12 @@
 
 <script>
 $(function () {
-    $('table tr').click(function () {
-        // var dataID = $(this).attr("data-id");
-				// var dataURL = $(this).attr("data-target");
-				console.log("/" + $(this).attr("data-myTarget") + "/" + $(this).attr("data-id"));
-				//console.log(window.location.href);
-        //window.location.href = "/" + dataURL + "/" + dataID;
+    $('.update-assignment-tbody tr').click(function () {
+        var data = $(this).data();
+				console.log(data);
+				console.log("/" + data['target'] + "/" + data['id']);
+				window.location.href += "/" + data['target'] + "?page=" + data['id'];
+				return false;
     });
 })
 </script>
