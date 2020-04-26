@@ -1,0 +1,217 @@
+
+{% extends "firstPage/base.html" %}
+{% load static %}
+{% block title %}
+	Ticket
+{% endblock %}
+{% block body %}
+
+{% if message == "LogedIn" %}
+
+
+<table id="myTickets" class="table table-borderless table-condensed">
+  <thead class="thead-white">
+		<tr>
+			<th colspan="12">Ticket - {{issue.id}}</th>
+		</tr>
+		<tr>
+			<th colspan="12"><button type="button" class="btn btn-light">Save and Close</button>
+			<button type="button" class="btn btn-light">Save</button>
+			<button type="button" class="btn btn-light">Cancel</button></th>
+		</tr>
+  </thead>
+  <tbody style="height:100px;overflow:scroll">
+	<tr class="thead-dark ">
+		<th colspan="12">Customer / User Details</th>
+	</tr>
+	<tr>
+		<td>
+			<table class=" table table-borderless table-condensed">
+				<tr>
+					<td style="width: 25%"></td>
+					<td style="width: 15%" class="font-weight-bold">Customer / User</td>
+					<td style="width: 15%" class="text-capitalize">{{issue.assignedBy}}</td>
+					<td style="width: 45%"></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td  class="font-weight-bold">Email Address</td>
+					<td>{{issue.assignedBy.email}}</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td  class="font-weight-bold">Phone</td>
+					<td>{{assigner.profile.phoneNumber}}</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td class="font-weight-bold">Role</td>
+					<td>{{assigner.profile.role}}</td>
+					<td></td>
+				</tr>
+			</table>
+		</td>
+		</tr>
+		<tr class="thead-dark">
+			<th colspan="12">Call Detail</th>
+		</tr>
+		<tr>
+			<td>
+				<table class="table table-borderless">
+					<tr>
+						<td style="width: 15%"></td>
+						<td style="width: 10%" class="font-weight-bold">Product</td>
+						<td style="width: 25%">{{issue.product}}</td>
+						<td style="width: 10%" class="font-weight-bold">Response Level</td>
+						<td style="width: 25%">{{issue.priority}}</td>
+						<td style="width: 15%"></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td class="font-weight-bold">Created On</td>
+						<td>{{issue.creadtedDate}}</td>
+						<td class="font-weight-bold">Status</td>
+						<td>{{issue.status}}</td>
+						<td></td>
+					</tr>
+					{% if issue.closedDate %}
+					<tr>
+						<td></td>
+						<td class="font-weight-bold">Resolveed On</td>
+						<td>{{issue.closedDate}}</td>
+						<td class="font-weight-bold">Resolved by</td>
+						<td class="text-capitalize">{{issue.assignedTo.first_name}}</td>
+						<td></td>
+					</tr>
+					{% endif %}
+					<tr>
+						<td colspan="12">
+							<table class="table">
+								<tr>
+									<td style="width: 15%"></td>
+									<td style="width: 10%" class="font-weight-bold">Summary</td>
+									<td style="width: 60%"><span class="input-group-text" id="basic-addon3">{{issue.summary}}</span></td>
+									<td style="width: 15%"></td>
+								</tr>
+								<tr>
+									<td></td>
+									<td class="font-weight-bold">User Enquery</td>
+									<td class="text-left">
+										<textarea rows="15" class="form-control" disabled>{{issue.description}}</textarea>
+									</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td></td>
+									<td class="font-weight-bold">Investigation Taken</td>
+									<td class="text-left">
+										{% if investigationDetails.investigationTaken %}
+										<textarea rows="15" class="form-control">{{investigationDetails.investigationTaken}}</textarea>
+										{% else %}
+										<textarea rows="15" class="form-control"></textarea>
+										{% endif %}
+									</td>
+									<td></td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<table class="table table-borderless table-condensed">
+					<td id="updateTD" onClick="$('#assignmentTable').hide(); $('#updateTable').show(); $('#updateTD').removeClass('table-dark').addClass('table-light'); $('#assignmentTD').addClass('table-dark').removeClass('table-light')" class="table-light">Updates</td>
+					<td id="assignmentTD" onClick="$('#updateTable').hide(); $('#assignmentTable').show(); $('#assignmentTD').removeClass('table-dark').addClass('table-light'); $('#updateTD').addClass('table-dark').removeClass('table-light')" class="table-dark">Assignment</td>
+				</table>
+			</td>
+		</tr>
+		<tr id="updateTable" >
+			<td>
+				<a class="btn btn-light" href="{% url 'addUpdate' issue.id %}" role="button">Add Update</a>
+				<table class="table table-borderless table-condensed">
+					<thead>
+					<tr>
+						<th style="width: 5%" scope="col">S. No.</th>
+						<th style="width: 15%" scope="col">Date Added</th>
+						<th style="width: 10%" scope="col">Added By</th>
+						<th style="width: 65%" scope="col">Update</th>
+						<th style="width: 5%" scope="col">Attachments available</th>
+					</tr>
+					</thead>
+					<tbody class="update-assignment-tbody">
+						{% for issueUpdateDetail in issueUpdateDetails %}
+							<tr data-target="update" data-id={{ forloop.counter }} class="{% cycle 'odd' 'even' %}">
+								<th scope="row">{{ issueUpdateDetail.sequence }}</th>
+								<td>{{ issueUpdateDetail.dateAdded }}</td>
+								<td>{{ issueUpdateDetail.addedBy }}</td>
+								<td>{{ issueUpdateDetail.update|truncatewords:6 }}</td>
+								<td>
+									{% if issueUpdateDetail.attachments %}
+										Yes
+									{% else %}
+										No
+									{% endif %}
+								</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</td>
+		</tr>
+		<tr id="assignmentTable" style="display:none" >
+			<td>
+				<a class="btn btn-light" href="{% url 'assignComment' issue.id %}" role="button">Add Assignment</a>
+				<table class="table table-borderless table-condensed">
+						<thead>
+							<tr>
+								<th style="width: 5%" scope="col">S. No.</th>
+								<th style="width: 15%" scope="col">Date Added</th>
+								<th style="width: 10%" scope="col">Added By</th>
+								<th style="width: 10%" scope="col">Assigned To</th>
+								<th style="width: 55%" scope="col">Comment</th>
+								<th style="width: 5%" scope="col">Attachments available</th>
+							</tr>
+						</thead>
+						<tbody class="update-assignment-tbody">
+							{% for issueAssignmentDetail in issueAssignmentDetails %}
+								<tr data-target="assignment" data-id={{ forloop.counter }} class="{% cycle 'odd' 'even' %}">
+									<th scope="row">{{ issueAssignmentDetail.sequence }}</th>
+									<td>{{ issueAssignmentDetail.createdDate }}</td>
+									<td>{{ issueAssignmentDetail.assignedBy }}</td>
+									<td>{{ issueAssignmentDetail.assignedTo }}</td>
+									<td>{{ issueAssignmentDetail.comment|truncatewords:6 }}</td>
+									<td>
+									{% if issueAssignmentDetail.attachments %}
+										Yes
+									{% else %}
+										No
+									{% endif %}
+								</td>
+								</tr>
+							{% endfor %}
+						<tbody>
+				</table>
+			</td>
+		</tr>
+  </tbody>
+</table>
+
+<script>
+$(function () {
+    $('.update-assignment-tbody tr').click(function () {
+        var data = $(this).data();
+				console.log(data);
+				console.log("/" + data['target'] + "/" + data['id']);
+				window.location.href += "/" + data['target'] + "?page=" + data['id'];
+				return false;
+    });
+})
+</script>
+
+{% endif %}
+
+{% endblock %}
