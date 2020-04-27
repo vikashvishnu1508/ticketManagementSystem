@@ -22,69 +22,26 @@ from django_filters.views import FilterView
 from django_tables2.views import SingleTableMixin
 
 # Create your views here.
-def index(request):
-    if not request.user.is_authenticated:
-        if request.method == 'POST':
-            form = SignUpForm(data=request.POST)
-            if form.is_valid():
-                user = form.save()
-                user.refresh_from_db()  # load the profile instance created by the signal
-                user.profile.birth_date = form.cleaned_data.get('birth_date')
-                user.profile.address = form.cleaned_data.get('address')
-                user.profile.phoneNumber = form.cleaned_data.get('phoneNumber')
-                user.profile.role = form.cleaned_data.get('role')
-                user.save()
-                username = form.cleaned_data.get('username')
-                raw_password = form.cleaned_data.get('password1')
-                user = authenticate(username=username, password=raw_password)
-                login(request, user)
-            return HttpResponseRedirect(reverse('index'))
-        else:
-            form = SignUpForm()
-            return render(request, 'firstPage/index.html', {'form': form, 'message': None})
-    else:
-        issues = IssuesFilter(request.GET, queryset=Issue.objects.all())
-        table = IssueTable(issues.qs)
-        RequestConfig(request).configure(table)
-        table.paginate(page=request.GET.get("page", 1), per_page=5)
-        context = {
-            'user': request.user,
-            'message': 'LogedIn',
-            'filter': issues,
-            'table': table
-        }
-        return render(request, 'firstPage/index.html', context)
+class SignUp(View):
+    def get(self, request):
+        form = SignUpForm()
+        return render(request, 'firstPage/signup.html', {'form': form, 'message': None})
 
-
-def myTickets(request):
-    issues = IssuesFilter({'assignedTo': request.user}, queryset=Issue.objects.all())
-    table = IssueTable(issues.qs)
-    RequestConfig(request).configure(table)
-    table.paginate(page=request.GET.get("page", 1), per_page=5)
-    context = {
-        'user': request.user,
-        'message': 'LogedIn',
-        'filter': issues,
-        'table': table
-    }
-    return render(request, 'firstPage/index.html', context)
-
-def login_view(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
+    def post(self, request):
+        form = SignUpForm(data=request.POST)
+        if form.is_valid():
+            user = form.save()
+            user.refresh_from_db()  # load the profile instance created by the signal
+            user.profile.birth_date = form.cleaned_data.get('birth_date')
+            user.profile.address = form.cleaned_data.get('address')
+            user.profile.phoneNumber = form.cleaned_data.get('phoneNumber')
+            user.profile.role = form.cleaned_data.get('role')
+            user.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
             login(request, user)
-            return HttpResponseRedirect(reverse('index'))
-        else:
-            return render(request, 'firstPage/login.html', {'message': 'Invalid credential'})
-    else:
-        return render(request, 'firstPage/login.html')
-
-def logout_view(request):
-    logout(request)
-    return render(request, 'firstPage/logout.html', {'message': 'Logout sucessfuly!'})
+        return HttpResponseRedirect(reverse('issues'))
 
 
 class CreateIssue(View):
@@ -163,7 +120,7 @@ class TicketsAssignComment(CreateView):
     model = IssueAssignmentDetails
     # fields = ['assignedTo','comment', 'attachments']
     template_name = 'firstPage/assignComment.html'
-    
+
     def form_valid(self, form):
         issue = Issue.objects.get(pk=self.kwargs['ticket'])
         form.instance.assignedBy = self.request.user
@@ -175,7 +132,7 @@ class TicketsAssignComment(CreateView):
         form.save()
         # print(self.kwargs['ticket'])
         return super(TicketsAssignComment, self).form_valid(form)
-    
+
     def get_success_url(self):
         return reverse('ticket', args=[self.kwargs['ticket']])
 
@@ -186,4 +143,46 @@ class FilteredIssueListView(SingleTableMixin, FilterView):
     template_name = "firstPage/issue.html"
     filterset_class = IssuesFilter
     paginate_by = 10
+
+# need to edit this part
+# class FilteredMyTicketsListView(SingleTableMixin, FilterView):
+#     table_class = IssueTable
+#     model = Issue
+#     template_name = "firstPage/issue.html"
+#     filterset_class = IssuesFilter
+#     paginate_by = 10
+
+
+
+class MyTickets(View):
+    def get(self, request):
+        issues = IssuesFilter({'assignedTo': request.user}, queryset=Issue.objects.all())
+        table = IssueTable(issues.qs)
+        RequestConfig(request).configure(table)
+        table.paginate(page=request.GET.get("page", 1), per_page=5)
+        context = {
+            'user': request.user,
+            'message': 'LogedIn',
+            'filter': issues,
+            'table': table
+        }
+        return render(request, 'firstPage/index.html', context)
+
+
+def index(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('login'))
+    else:
+        issues = IssuesFilter(request.GET, queryset=Issue.objects.all())
+        table = IssueTable(issues.qs)
+        RequestConfig(request).configure(table)
+        table.paginate(page=request.GET.get("page", 1), per_page=5)
+        context = {
+            'user': request.user,
+            'message': 'LogedIn',
+            'filter': issues,
+            'table': table
+        }
+        return render(request, 'firstPage/index.html', context)
+
 

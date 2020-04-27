@@ -33,9 +33,9 @@ class Role(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    location = models.CharField(max_length=30, blank=True)
+    location = models.CharField(max_length=30, blank=True, null=True)
     birth_date = models.DateField(null=True, blank=True)
-    address = models.CharField(max_length=8000)
+    address = models.CharField(max_length=8000, blank=True, null=True)
     phoneNumber = models.CharField(max_length=10)
     role = models.ForeignKey(Role,
                              on_delete=models.CASCADE,

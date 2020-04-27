@@ -28,17 +28,16 @@ class SignUpForm(UserCreationForm):
                                  widget=forms.PasswordInput(attrs={'class':'form-control col-md-6 float-right',
                                                                'placeholder':'Re-enter password *'}))
     
-    birth_date = forms.DateField(help_text="Required. Format: YYYY-MM-DD",
-                                 widget=forms.DateInput(attrs={'id':'birth-date',
+    birth_date = forms.DateField(widget=forms.DateInput(attrs={'id':'birth-date',
                                                                 'class':'form-control col-md-6 float-left',
-                                                                'placeholder':'Please enter Birth Date *'}))
+                                                                'placeholder':'Please enter Birth Date (optional)'}))
     phoneNumber = forms.CharField(max_length=10, help_text='Required.',
                                  widget=forms.TextInput(attrs={'class':'form-control col-md-6 float-right',
                                                                'placeholder':'Phone Number *'}))
     
-    address = forms.CharField(max_length=8000, help_text='Required.',
+    address = forms.CharField(max_length=8000,
                                  widget=forms.Textarea(attrs={'class':'form-control',
-                                                               'placeholder':'Address *',
+                                                               'placeholder':'Address (optional)',
                                                                'style': 'height: 5em;'}))
     
     role = forms.ModelChoiceField(Role.objects.all(),
@@ -46,6 +45,12 @@ class SignUpForm(UserCreationForm):
                                                         'placeholder':'Please select a role *'}),
                             to_field_name="name",
                             empty_label=None)
+    
+    def __init__(self, *args, **kwargs):
+        super(SignUpForm, self).__init__(*args, **kwargs)
+        self.fields['address'].required = False
+        self.fields['birth_date'].required = False
+    
     class Meta:
         model = User
         fields = ('first_name',

@@ -24,7 +24,8 @@
 $(function () {
     $('table.table tr').click(function () {
         var myVal = $(this).attr("data-id");
-        window.location.href = "/" + myVal;
+        
+        window.location.href += "/" + myVal;
     });
 })
 </script>
