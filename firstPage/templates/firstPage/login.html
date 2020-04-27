@@ -3,11 +3,6 @@
 	Login Page
 {% endblock %}
 {% block body %}
-	{% if message %}
-		<div>
-			{{ message }}
-		</div>
-	{% endif %}
 	<!--
 	<form action="{% url 'login' %}" method="POST">
 		{% csrf_token %}
@@ -23,6 +18,9 @@
 						</div>
 						<div class="col-md-4">
 								<p>Login here</p>
+								{% if form.errors %}
+										<p>Your username and password didn't match. Please try again.</p>
+								{% endif %}
 								<form action="{% url 'login' %}" method="POST">
 								{% csrf_token %}
 									<div class="form-group">
@@ -32,11 +30,13 @@
 									<div class="form-group">
 										<input type="password" class="form-control" name="password" placeholder="Password">
 									</div>
+									<p>Lost password? <a href="{% url 'password_reset' %}">Click here</a> to reset</p>
 									<br>
 									<button type="submit" class="btn btn-primary" style="width:100%">Login</button>
+									<input type="hidden" name="next" value="{{ next }}">
 								</form>
 								<br>
-								<p> Don't have an account <a href = {% url 'index' %}>Create one</a></p>
+								<p> Don't have an account <a href = {% url 'signup' %}>Create one</a></p>
 						</div>
 						<div class="col-md-4">
 						</div>
