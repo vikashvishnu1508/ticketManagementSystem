@@ -15,9 +15,10 @@ urlpatterns = [
     path('password_reset_confirm/<uidb64>/<token>/', PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path('password_reset_complete', PasswordResetCompleteView.as_view(), name="password_reset_complete"),
     
-    # path('', views.index, name="index"),
+    path('', views.index, name="index"),
     path('createIssue', views.CreateIssue.as_view(), name='createIssue'),
     path('myTicket', views.MyTickets.as_view(), name="myTicket"),
+    path('myTickets', login_required(login_url='login')(views.MyTicketsFilteredListView.as_view()), name="myTickets"),
     path('issues', login_required(login_url='login')(views.FilteredIssueListView.as_view()), name="issues"),
     path('issues/<int:ticket>', views.tickets, name="ticket"),
     path('issues/<int:ticket>/addUpdate', views.TicketAddUpdate.as_view(), name="addUpdate"),

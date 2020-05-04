@@ -1,4 +1,5 @@
 import os
+import copy
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.http import Http404, HttpResponse, HttpResponseRedirect
@@ -7,6 +8,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.views import View
 from django.views.generic import ListView, CreateView
+from django.contrib.auth.decorators import login_required
 
 
 from .models import Department, Role, Product, IssueType, Priority, Status, Issue, Profile, InvestigationDetails, IssueAssignmentDetails, IssueUpdateDetails
@@ -130,7 +132,6 @@ class TicketsAssignComment(CreateView):
         issue.assignedBy = form.instance.assignedBy
         issue.save(update_fields=['assignedTo', 'assignedBy'])
         form.save()
-        # print(self.kwargs['ticket'])
         return super(TicketsAssignComment, self).form_valid(form)
 
     def get_success_url(self):
@@ -145,13 +146,27 @@ class FilteredIssueListView(SingleTableMixin, FilterView):
     paginate_by = 10
 
 # need to edit this part
-# class FilteredMyTicketsListView(SingleTableMixin, FilterView):
-#     table_class = IssueTable
-#     model = Issue
-#     template_name = "firstPage/issue.html"
-#     filterset_class = IssuesFilter
-#     paginate_by = 10
-
+class MyTicketsFilteredListView(SingleTableMixin, FilterView):
+    table_class = IssueTable
+    model = Issue
+    template_name = "firstPage/issue.html"
+    filterset_class = IssuesFilter
+    paginate_by = 10
+    
+    def get(self, request, *args, **kwargs):
+        self.current_request = request
+        return super().get(request, *args, **kwargs)
+    
+    def get_queryset(self):
+        if self.current_request.GET:
+            filter_values = copy.copy(self.current_request.GET)
+            filter_values['assignedTo'] = str(self.current_request.user.id)
+            issues = IssuesFilter(filter_values, queryset=Issue.objects.all())
+            return issues.qs
+        else:
+            issues = IssuesFilter({'assignedTo': self.current_request.user}, queryset=Issue.objects.all())
+            return issues.qs
+        
 
 
 class MyTickets(View):
@@ -170,19 +185,20 @@ class MyTickets(View):
 
 
 def index(request):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect(reverse('login'))
-    else:
-        issues = IssuesFilter(request.GET, queryset=Issue.objects.all())
-        table = IssueTable(issues.qs)
-        RequestConfig(request).configure(table)
-        table.paginate(page=request.GET.get("page", 1), per_page=5)
-        context = {
-            'user': request.user,
-            'message': 'LogedIn',
-            'filter': issues,
-            'table': table
-        }
-        return render(request, 'firstPage/index.html', context)
+    return HttpResponseRedirect('issues')
+    # if not request.user.is_authenticated:
+    #     return HttpResponseRedirect(reverse('login'))
+    # else:
+    #     issues = IssuesFilter(request.GET, queryset=Issue.objects.all())
+    #     table = IssueTable(issues.qs)
+    #     RequestConfig(request).configure(table)
+    #     table.paginate(page=request.GET.get("page", 1), per_page=5)
+    #     context = {
+    #         'user': request.user,
+    #         'message': 'LogedIn',
+    #         'filter': issues,
+    #         'table': table
+    #     }
+    #     return render(request, 'firstPage/index.html', context)
 
 
