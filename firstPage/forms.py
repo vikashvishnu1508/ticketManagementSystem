@@ -110,6 +110,10 @@ class AddUpdate(ModelForm):
     attachments = forms.FileField(widget=forms.FileInput(attrs={'class':'form-control-file',
                                                             'placeholder':'Upload files',}))
 
+    def __init__(self, *args, **kwargs):
+        super(AddUpdate, self).__init__(*args, **kwargs)
+        self.fields['attachments'].required = False
+
     class Meta:
         model = IssueUpdateDetails
         fields = ('update',
@@ -127,6 +131,10 @@ class AssignComment(ModelForm):
                                                         'placeholder':'Add asignment comment',}))
     attachments = forms.FileField(widget=forms.FileInput(attrs={'class':'form-control-file',
                                                             'placeholder':'Upload files',}))
+
+    def __init__(self, *args, **kwargs):
+        super(AssignComment, self).__init__(*args, **kwargs)
+        self.fields['attachments'].required = False
 
     class Meta:
         model = IssueAssignmentDetails

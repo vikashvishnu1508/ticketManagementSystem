@@ -9,15 +9,17 @@ class IssueSerializer(serializers.ModelSerializer):
             'product',
             'summary',
             'description',
+            'issueType',
+            'priority',
         ]
     
     def create(self, validated_data):
         issue = {}
-        issue['issueType'] = IssueType.objects.get(pk=3)
-        issue['assignedTo'] = User.objects.get(pk=13)
-        issue['assignedBy'] = User.objects.get(pk=13)
+        issue['assignedTo'] = User.objects.get(pk=2)
+        issue['assignedBy'] = User.objects.get(pk=4)
         issue['status'] = Status.objects.get(pk=1)
-        issue['priority'] = Priority.objects.get(pk=1)
+        issue['issueType'] = validated_data['issueType']
+        issue['priority'] = validated_data['priority']
         issue['product'] = validated_data['product']
         issue['summary'] = validated_data['summary']
         issue['description'] = validated_data['description']
