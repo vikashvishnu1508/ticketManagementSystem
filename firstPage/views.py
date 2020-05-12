@@ -2,19 +2,24 @@ import os
 import copy
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.views import View
 from django.views.generic import ListView, CreateView
 from django.contrib.auth.decorators import login_required
-
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import status
+import json
 
 from .models import Department, Role, Product, IssueType, Priority, Status, Issue, Profile, InvestigationDetails, IssueAssignmentDetails, IssueUpdateDetails
 from .forms import SignUpForm, IssueCreationForm, AddUpdate, AssignComment
 from .filters import IssuesFilter
 from .tables import IssueTable
+from .serializers import IssueSerializer
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -60,26 +65,15 @@ class CreateIssue(View):
             issue.save()
         return render(request, 'firstPage/createIssue.html', {'message': 'Issue Created sucessfuly!'})
 
-
-def tickets(request, ticket):
-    try:
-        issue = Issue.objects.get(pk=ticket)
-        customerDetails = User.objects.get(pk=issue.assignedBy.id)
-        investigationDetails = InvestigationDetails.objects.filter(id=ticket)
-        issueAssignmentDetails = IssueAssignmentDetails.objects.filter(issue=ticket)
-        issueUpdateDetails = IssueUpdateDetails.objects.filter(issue=ticket)
-        context= {
-            'user': request.user,
-            'message': 'LogedIn',
-            'issue': issue,
-            'assigner': customerDetails,
-            'investigationDetails': investigationDetails,
-            'issueAssignmentDetails': issueAssignmentDetails,
-            'issueUpdateDetails': issueUpdateDetails
-        }
-        return render(request, 'firstPage/ticket.html', context)
-    except:
-        raise Http404("Please try again after sometime")
+class CreateIssueAPI(APIView):
+    def post(self, request, format=None):
+        serializer = IssueSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            jsonobj = serializer.data
+            jsonobj['id'] = serializer.instance.pk
+            return Response(jsonobj, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TicketAddUpdate(View):
@@ -146,7 +140,7 @@ class FilteredIssueListView(SingleTableMixin, FilterView):
     paginate_by = 10
 
 # need to edit this part
-class MyTicketsFilteredListView(SingleTableMixin, FilterView):
+class MyTicketsView(SingleTableMixin, FilterView):
     table_class = IssueTable
     model = Issue
     template_name = "firstPage/issue.html"
@@ -166,39 +160,27 @@ class MyTicketsFilteredListView(SingleTableMixin, FilterView):
         else:
             issues = IssuesFilter({'assignedTo': self.current_request.user}, queryset=Issue.objects.all())
             return issues.qs
-        
-
-
-class MyTickets(View):
-    def get(self, request):
-        issues = IssuesFilter({'assignedTo': request.user}, queryset=Issue.objects.all())
-        table = IssueTable(issues.qs)
-        RequestConfig(request).configure(table)
-        table.paginate(page=request.GET.get("page", 1), per_page=5)
-        context = {
-            'user': request.user,
-            'message': 'LogedIn',
-            'filter': issues,
-            'table': table
-        }
-        return render(request, 'firstPage/index.html', context)
-
 
 def index(request):
     return HttpResponseRedirect('issues')
-    # if not request.user.is_authenticated:
-    #     return HttpResponseRedirect(reverse('login'))
-    # else:
-    #     issues = IssuesFilter(request.GET, queryset=Issue.objects.all())
-    #     table = IssueTable(issues.qs)
-    #     RequestConfig(request).configure(table)
-    #     table.paginate(page=request.GET.get("page", 1), per_page=5)
-    #     context = {
-    #         'user': request.user,
-    #         'message': 'LogedIn',
-    #         'filter': issues,
-    #         'table': table
-    #     }
-    #     return render(request, 'firstPage/index.html', context)
 
 
+def tickets(request, ticket):
+    try:
+        issue = Issue.objects.get(pk=ticket)
+        customerDetails = User.objects.get(pk=issue.assignedBy.id)
+        investigationDetails = InvestigationDetails.objects.filter(id=ticket)
+        issueAssignmentDetails = IssueAssignmentDetails.objects.filter(issue=ticket)
+        issueUpdateDetails = IssueUpdateDetails.objects.filter(issue=ticket)
+        context= {
+            'user': request.user,
+            'message': 'LogedIn',
+            'issue': issue,
+            'assigner': customerDetails,
+            'investigationDetails': investigationDetails,
+            'issueAssignmentDetails': issueAssignmentDetails,
+            'issueUpdateDetails': issueUpdateDetails
+        }
+        return render(request, 'firstPage/ticket.html', context)
+    except:
+        raise Http404("Please try again after sometime")
