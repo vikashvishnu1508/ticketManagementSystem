@@ -1,0 +1,58 @@
+
+{% extends "firstPage/base.html" %}
+{% load static %}
+{% block title %}
+	Update
+{% endblock %}
+{% block body %}
+
+<div class="jumbotron jumbotron-fluid vertical-center">
+		<div class="container">
+				{% for update in updates %}
+				<div class="row align-items-center">
+						<div class="col-md-12">
+								<table class="table table-borderless">
+									<tbody>
+										<tr>
+											<th class="text-left">Added By: {{ update.addedBy }}</th>
+											<td class="text-right">Added On: {{ update.dateAdded }}</td>
+										</tr>
+										<tr>
+											<th colspan="2" class="text-left">Update: <br>{{ update.update }}</th>
+										</tr>
+										<tr>
+											<th colspan="2" class="text-left">
+												{% if update.attachments %}
+													Attachments: <a href="{{ update.attachments.url }}">{{ update.attachments.name }}</a>
+												{% else %}
+													Attachments: No attachments
+												{% endif %}
+											</th>
+										<tr>
+									</tbody>
+								</table>
+						</div>
+				</div>
+				{% endfor %}
+				<div class="pagination">
+						<span class="step-links">
+								{% if page_obj.has_previous %}
+										<a href="?page=1">&laquo; first</a>
+										<a href="?page={{ page_obj.previous_page_number }}">previous</a>
+								{% endif %}
+
+								<span class="current">
+										Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+								</span>
+
+								{% if page_obj.has_next %}
+										<a href="?page={{ page_obj.next_page_number }}">next</a>
+										<a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+								{% endif %}
+						</span>
+				</div>
+		</div>
+</div>
+
+
+{% endblock %}

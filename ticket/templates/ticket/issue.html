@@ -1,0 +1,34 @@
+
+{% extends "firstPage/base.html" %}
+{% load render_table from django_tables2 %}
+{% load bootstrap3 %}
+{% load static %}
+{% block title %}
+	Issues
+{% endblock %}
+{% block body %}
+
+
+ {% if filter %}
+    <form action="" method="get" class="form form-inline">
+				{% for field in filter.form %}
+					{% bootstrap_field field show_label=False %}
+				{% endfor %}
+        {% bootstrap_button 'Search' button_type="submit" icon="search" %}
+    </form>
+{% endif %}
+
+{% render_table table 'django_tables2/bootstrap.html' %}
+
+<script>
+$(function () {
+    $('table.table tr').click(function () {
+        var myVal = $(this).attr("data-id");
+        
+        window.location.href += "/" + myVal;
+    });
+})
+</script>
+
+{% endblock %}
+

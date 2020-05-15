@@ -23,15 +23,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '3smkx#m7kgb39o!4gefi9c1qn185got-y=cuov4v2-4votg+6+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ["vikashticketing.herokuapp.com"]
+ALLOWED_HOSTS = []
 
 
 # Application definition
 
 INSTALLED_APPS = [
     'firstPage.apps.FirstpageConfig',
+    'registration.apps.RegistrationConfig',
+    'ticket.apps.TicketConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -82,15 +84,14 @@ WSGI_APPLICATION = 'ticketApp.wsgi.application'
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config()
-    #     {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'dbTicket',
-    #     'USER': 'root',
-    #     'PASSWORD': 'vikash1508',
-    #     'HOST': 'localhost',
-    #     'PORT': '3306',
-    # }
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'dbTicket',
+        'USER': 'root',
+        'PASSWORD': 'vikash1508',
+        'HOST': 'localhost',
+        'PORT': '3306',
+     }
 }
 
 
@@ -137,7 +138,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-LOGIN_REDIRECT_URL = 'issues'
-LOGOUT_REDIRECT_URL = 'issues'
+LOGIN_REDIRECT_URL = 'ticket/issues'
+LOGOUT_REDIRECT_URL = '/registration/login'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
