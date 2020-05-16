@@ -1,0 +1,33 @@
+{% load static %}
+<nav class="navbar navbar-expand-md navbar-dark bg-dark shadow-sm">
+  <a class="navbar-brand" href="{% url 'ticket:issues' %}">
+  <img src="{% static 'images/logo.jpg' %}" width="45" alt="" class="d-inline-block align-middle mr-2">
+  <img src="https://res.cloudinary.com/mhmd/image/upload/v1557368579/logo_iqjuay.png" width="45" alt="" class="d-inline-block align-middle mr-2">
+  <span class="text-uppercase font-weight-bold">TICKET 	TRACKER</span>
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarCollapse">
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'index' %}">About Us</a>
+      </li>
+      {% if user.is_authenticated %}
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'ticket:createIssue' %}">Create Ticket</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'registration:logout' %}">Logout</a>
+      </li>
+      {% else %}
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'registration:login' %}">Login</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'registration:regsignup' %}">Sign Up</a>
+      </li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>

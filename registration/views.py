@@ -20,15 +20,13 @@ class SignUp(View):
         form = SignUpForm(data=request.POST)
         if form.is_valid():
             user = form.save()
-            # user.refresh_from_db()  # load the profile instance created by the signal
-            # user.profile.birth_date = form.cleaned_data.get('birth_date')
-            # user.profile.address = form.cleaned_data.get('address')
-            # user.profile.phoneNumber = form.cleaned_data.get('phoneNumber')
-            # user.profile.role = form.cleaned_data.get('role')
-            # user.save()
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
-        return HttpResponseRedirect(reverse('issues'))
+            return HttpResponseRedirect(reverse('ticket:issues'))
+        return render(request, 'registration/signup.html', {'form': form, 'message': None})
 
+
+def index(request):
+    return render(request, 'registration/home.html')

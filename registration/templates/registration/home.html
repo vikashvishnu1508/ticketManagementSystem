@@ -1,0 +1,35 @@
+{% extends "registration/base.html" %}
+{% load static %}
+{% block title %}
+	Sign-Up
+{% endblock %}
+{% block body %}
+		<div class="jumbotron jumbotron-fluid vertical-center">
+		<div class="container loginPage">
+				<div class="row align-items-center">
+						<div class="col-md-12	">
+						 			<h1 class="text-left">The #1 software development tool used by agile teams</h1>
+						</div>
+				</div>
+				<div class="row">
+						<div class="col-md-2">
+						</div>
+						<div class="col-md-8">
+								<ul class="text-left">
+                      <li>Full access to all features</li>
+                      <li>Zero obligation, no credit card needed</li>
+                      <li>Add unlimited users</li>
+                      <li>Access to sales and technical support</li>
+                  </ul>
+									{% if user.is_authenticated %}
+
+									{% else %}
+									<p class="lead text-left">Signup for free!</p>
+									<p class="lead mb-0 text-left"><a class="btn btn-primary" href="{% url 'registration:regsignup' %}">Sign Up</a></p>
+									{% endif %}
+						</div>
+						<div class="col-md-2">
+						</div>
+				</div>
+		</div>
+{% endblock %}
