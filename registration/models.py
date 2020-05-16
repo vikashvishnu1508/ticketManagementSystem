@@ -11,7 +11,7 @@ class Department(models.Model):
                             null=False,
                             blank=False,
                             unique=True)
-    
+
     def __str__(self):
         return f'{self.name}'
 
@@ -25,7 +25,7 @@ class Role(models.Model):
                                    related_name='department',
                                    null=False,
                                    blank=False)
-    
+
     def __str__(self):
         return f'{self.department} - {self.name}'
 

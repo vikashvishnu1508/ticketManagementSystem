@@ -7,7 +7,6 @@ from django.urls import reverse
 from django.views import View
 
 from registration.models import Department, Role
-# , Profile
 from registration.forms import SignUpForm
 
 

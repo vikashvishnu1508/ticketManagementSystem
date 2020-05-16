@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'firstPage.apps.FirstpageConfig',
+    # 'firstPage.apps.FirstpageConfig',
     'registration.apps.RegistrationConfig',
     'ticket.apps.TicketConfig',
     'api.apps.ApiConfig',
@@ -139,7 +139,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-LOGIN_REDIRECT_URL = 'ticket/issues'
+LOGIN_REDIRECT_URL = 'ticket:issues'
 LOGOUT_REDIRECT_URL = '/registration/login'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
