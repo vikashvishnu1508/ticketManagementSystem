@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'firstPage.apps.FirstpageConfig',
     'registration.apps.RegistrationConfig',
     'ticket.apps.TicketConfig',
+    'api.apps.ApiConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
