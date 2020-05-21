@@ -15,6 +15,9 @@
       </li>
       {% if user.is_authenticated %}
       <li class="nav-item">
+        <a class="nav-link" href="{% url 'ticket:issues' %}">View Tickets</a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link" href="{% url 'ticket:createIssue' %}">Create Ticket</a>
       </li>
       <li class="nav-item">
